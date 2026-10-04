@@ -1,0 +1,23 @@
+cat << 'EOF' > .gitignore
+# Python & AI
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.pt
+*.onnx
+*.engine
+ai_engine/data/*
+!ai_engine/data/.gitkeep
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.env
+
+# PlatformIO / Firmware
+.pio/
+.vscode/
+EOF
