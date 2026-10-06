@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VietBee - Hệ Thống Quản Lý Đàn Ong Thông Minh</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN for beautiful interactive charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            honey: {
+              50: '#fffbeb',
+              100: '#fef3c7',
+              200: '#fde68a',
+              300: '#fcd34d',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+            },
+            leaf: {
+              500: '#10b981',
+              600: '#059669',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbar and smooth pulse */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .hive-cell {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hive-cell:hover {
+      transform: translateY(-2px) scale(1.08);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+
+  <!-- HEADER CHUNG (Box 1) -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Left: Menu Button & Brand -->
+        <div class="flex items-center gap-4">
+          <button id="menu-btn" class="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition focus:outline-hidden" title="Mở danh mục">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+          
+          <div class="flex items-center gap-2 cursor-pointer" onclick="switchPage('home')">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 flex items-center justify-center shadow-md shadow-amber-500/20 text-white font-bold text-xl">
+              🐝
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">VietBee</span>
+                <span class="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded-sm bg-amber-100 text-amber-800">Smart IoT</span>
+              </div>
+              <p class="text-[11px] text-slate-500 font-medium hidden sm:block">Trang trại ong Đắk Lắk - Khu Vực A</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+          <button onclick="switchPage('home')" id="nav-home" class="px-4 py-2 rounded-lg text-sm font-semibold transition bg-white text-slate-900 shadow-xs">
+            Trang Chủ
+          </button>
+          <button onclick="switchPage('hives')" id="nav-hives" class="px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-600 hover:text-slate-900">
+            Quản Lý Đàn Ong
+          </button>
+        </nav>
+
+        <!-- Right: Notification & Profile -->
+        <div class="flex items-center gap-3">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notif-btn" class="p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 relative transition" title="Thông báo">
+              <i data-lucide="bell" class="w-5 h-5"></i>
+              <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
+            </button>
+            <!-- Dropdown Notification -->
+            <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 z-50">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <span class="font-bold text-sm text-slate-900">Cảnh báo đàn ong</span>
+                <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">3 sự cố mới</span>
+              </div>
+              <div class="space-y-3 mt-3 text-xs">
+                <div class="flex gap-2.5 p-2 rounded-xl bg-red-50 text-red-800 cursor-pointer" onclick="openHiveModal('VB-023')">
+                  <span class="text-red-500 text-base">🔴</span>
+                  <div>
+                    <p class="font-bold">VB-023: Nhiệt độ vượt ngưỡng (37.2°C)</p>
+                    <span class="text-[10px] text-red-600">10 phút trước</span>
+                  </div>
+                </div>
+                <div class="flex gap-2.5 p-2 rounded-xl bg-amber-50 text-amber-800 cursor-pointer" onclick="openHiveModal('VB-041')">
+                  <span class="text-amber-500 text-base">🟡</span>
+                  <div>
+                    <p class="font-bold">VB-041: Độ ẩm cao bất thường (84%)</p>
+                    <span class="text-[10px] text-amber-600">35 phút trước</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Profile -->
+          <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 p-0.5 flex items-center justify-center">
+              <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                NV
+              </div>
+            </div>
+            <div class="hidden lg:block text-left">
+              <div class="text-xs font-bold text-slate-800 leading-tight">Kỹ Sư Tuấn</div>
+              <div class="text-[10px] text-emerald-600 font-medium">Trực ca sáng</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Tab Switcher -->
+  <div class="md:hidden flex border-b border-slate-200 bg-white">
+    <button onclick="switchPage('home')" id="mob-nav-home" class="flex-1 py-3 text-sm font-semibold text-center border-b-2 border-amber-500 text-amber-600">Trang Chủ</button>
+    <button onclick="switchPage('hives')" id="mob-nav-hives" class="flex-1 py-3 text-sm font-semibold text-center border-b-2 border-transparent text-slate-500">Quản Lý Đàn</button>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ============================================== -->
+    <!-- ============================================== -->
+    <section id="page-home" class="space-y-6">
+      
+      <!-- BOX 2: Điều kiện môi trường -->
+      <div class="bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-blue-500/10 border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <span class="p-2 rounded-xl bg-amber-500 text-white shadow-xs">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+            </span>
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Khu Vực Trang Trại</span>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900">Thung Lũng Hoa Cà Phê, Buôn Ma Thuột</h2>
+            </div>
+          </div>
+
+          <!-- Môi trường Live Cards -->
+          <div class="grid grid-cols-3 gap-2 sm:gap-4">
+            <!-- Nhiệt độ -->
+            <div class="bg-white/90 backdrop-blur rounded-xl p-3 border border-slate-200/80 flex items-center gap-2.5">
+              <span class="text-xl">🌡️</span>
+              <div>
+                <p class="text-[11px] text-slate-500 font-medium">Nhiệt độ</p>
+                <p class="text-sm sm:text-base font-bold text-slate-900">28.5°C</p>
+              </div>
+            </div>
+            <!-- Độ ẩm -->
+            <div class="bg-white/90 backdrop-blur rounded-xl p-3 border border-slate-200/80 flex items-center gap-2.5">
+              <span class="text-xl">💧</span>
+              <div>
+                <p class="text-[11px] text-slate-500 font-medium">Độ ẩm</p>
+                <p class="text-sm sm:text-base font-bold text-slate-900">72%</p>
+              </div>
+            </div>
+            <!-- Thời tiết -->
+            <div class="bg-white/90 backdrop-blur rounded-xl p-3 border border-slate-200/80 flex items-center gap-2.5">
+              <span class="text-xl">☀️️</span>
+              <div>
+                <p class="text-[11px] text-slate-500 font-medium">Thời tiết</p>
+                <p class="text-sm sm:text-base font-bold text-slate-900">Nắng nhẹ</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOX 3: Các chỉ số tổng quan -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Tổng đàn -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:border-amber-400 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500">Tổng đàn ong</span>
+            <span class="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-lg">🐝</span>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span class="text-2xl sm:text-3xl font-extrabold text-slate-900">128</span>
+            <span class="text-xs text-slate-500 font-medium">đàn hoạt động</span>
+          </div>
+          <div class="mt-2 flex items-center gap-1 text-xs text-emerald-600 font-semibold">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+            <span>+12 đàn so với tháng trước</span>
+          </div>
+        </div>
+
+        <!-- Sản lượng mật -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:border-amber-400 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500">Sản lượng mật</span>
+            <span class="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-lg">🍯</span>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span class="text-2xl sm:text-3xl font-extrabold text-slate-900">2,840</span>
+            <span class="text-xs text-slate-500 font-medium">kg tích lũy</span>
+          </div>
+          <div class="mt-2 flex items-center gap-1 text-xs text-emerald-600 font-semibold">
+            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            <span>+8.5% so với cùng kỳ</span>
+          </div>
+        </div>
+
+        <!-- Doanh thu -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:border-amber-400 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500">Doanh thu vụ này</span>
+            <span class="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-lg">💰</span>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span class="text-2xl sm:text-3xl font-extrabold text-slate-900">186.5</span>
+            <span class="text-xs text-slate-500 font-medium">M VNĐ</span>
+          </div>
+          <div class="mt-2 flex items-center gap-1 text-xs text-emerald-600 font-semibold">
+            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            <span>+12.3% tiến độ mục tiêu</span>
+          </div>
+        </div>
+
+        <!-- Năng suất TB -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:border-amber-400 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500">Năng suất bình quân</span>
+            <span class="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-lg">📈</span>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span class="text-2xl sm:text-3xl font-extrabold text-slate-900">22.2</span>
+            <span class="text-xs text-slate-500 font-medium">kg/đàn</span>
+          </div>
+          <div class="mt-2 flex items-center gap-1 text-xs text-emerald-600 font-semibold">
+            <i data-lucide="award" class="w-3.5 h-3.5"></i>
+            <span>Đạt chuẩn loại A</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BIỂU ĐỒ BOX 4, 5, 6, 7 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Box 4: Biểu đồ số lượng đàn trong năm (8 cols) -->
+        <div class="lg:col-span-8 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Box 4 — Số Lượng Đàn Trong Năm</h3>
+              <p class="text-xs text-slate-500">Diễn biến phát triển quy mô trang trại (12 tháng qua)</p>
+            </div>
+            <span class="text-xs bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-full">Năm 2026</span>
+          </div>
+          <div class="relative h-64 sm:h-72 w-full">
+            <canvas id="chart-colonies"></canvas>
+          </div>
+        </div>
+
+        <!-- Box 7: Tổng quan trạng thái đàn (4 cols) -->
+        <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Box 7 — Trạng Thái Đàn</h3>
+              <p class="text-xs text-slate-500">Giám sát sức khỏe thời gian thực</p>
+            </div>
+            <button onclick="switchPage('hives')" class="text-xs text-amber-600 font-bold hover:underline">Chi tiết →</button>
+          </div>
+          <div class="relative h-48 w-full flex items-center justify-center">
+            <canvas id="chart-status"></canvas>
+          </div>
+          <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 text-center text-xs">
+            <div class="p-2 rounded-xl bg-emerald-50 text-emerald-800">
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1"></span>
+              <span class="font-bold">112</span> Khỏe
+            </div>
+            <div class="p-2 rounded-xl bg-amber-50 text-amber-800">
+              <span class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-1"></span>
+              <span class="font-bold">10</span> Theo dõi
+            </div>
+            <div class="p-2 rounded-xl bg-red-50 text-red-800">
+              <span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-1"></span>
+              <span class="font-bold">6</span> Vấn đề
+            </div>
+          </div>
+        </div>
+
+        <!-- Box 5: Sản lượng mật theo tháng (6 cols) -->
+        <div class="lg:col-span-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Box 5 — Sản Lượng Mật (kg)</h3>
+              <p class="text-xs text-slate-500">Thu hoạch thực tế theo tháng</p>
+            </div>
+            <span class="text-xs text-slate-500">Đơn vị: Kilogram</span>
+          </div>
+          <div class="relative h-60 w-full">
+            <canvas id="chart-honey"></canvas>
+          </div>
+        </div>
+
+        <!-- Box 6: Doanh thu theo tháng (6 cols) -->
+        <div class="lg:col-span-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Box 6 — Doanh Thu (Triệu VNĐ)</h3>
+              <p class="text-xs text-slate-500">Doanh số bán mật & phụ phẩm</p>
+            </div>
+            <span class="text-xs text-slate-500">Đơn vị: Triệu VNĐ</span>
+          </div>
+          <div class="relative h-60 w-full">
+            <canvas id="chart-revenue"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BOX 8: Tóm tắt nhanh -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+        <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
+          <span>📋</span> Box 8 — Tóm Tắt Nhanh Vận Hành
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-slate-700">
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+            <p class="text-xs text-slate-500">Tăng trưởng đàn</p>
+            <p class="text-lg font-extrabold text-emerald-600 mt-1">+12 đàn mới</p>
+            <p class="text-[11px] text-slate-400">Tách đàn tự nhiên thành công</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+            <p class="text-xs text-slate-500">Sản lượng tháng này</p>
+            <p class="text-lg font-extrabold text-amber-600 mt-1">+8.5%</p>
+            <p class="text-[11px] text-slate-400">Vào chính vụ mật hoa cà phê</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+            <p class="text-xs text-slate-500">Doanh thu tháng này</p>
+            <p class="text-lg font-extrabold text-emerald-600 mt-1">+12.3%</p>
+            <p class="text-[11px] text-slate-400">Đơn sỉ xuất khẩu ổn định</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+            <p class="text-xs text-slate-500">Năng suất trung bình</p>
+            <p class="text-lg font-extrabold text-slate-800 mt-1">22.2 kg/đàn</p>
+            <p class="text-[11px] text-slate-400">Cao hơn 15% mức bình quân vùng</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================== -->
+    <!-- ============================================== -->
+    <section id="page-hives" class="hidden space-y-6">
+
+      <!-- BOX 2: Tổng quan nhanh trạng thái -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-700 flex items-center justify-center font-bold text-lg">
+            🐝
+          </div>
+          <div>
+            <h2 class="font-bold text-slate-900 text-lg">Sơ Đồ Ma Trận Thùng Ong</h2>
+            <p class="text-xs text-slate-500">Theo dõi trực quan trạng thái vật lý từng tổ ong</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5 text-xs font-semibold">
+          <div class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 border border-slate-200">
+            Tổng thùng: <span class="font-bold text-slate-900 text-sm">128</span>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200">
+            🟢 Hoạt động tốt: <span class="font-bold text-emerald-700 text-sm">112</span>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200">
+            🟡 Cần theo dõi: <span class="font-bold text-amber-700 text-sm">10</span>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-red-50 text-red-800 border border-red-200 animate-pulse">
+            🔴 Có vấn đề: <span class="font-bold text-red-700 text-sm">6</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOX 4: Bộ lọc & Tìm kiếm -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          
+          <!-- Tìm kiếm ID -->
+          <div class="relative lg:col-span-2">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i data-lucide="search" class="w-4 h-4"></i>
+            </span>
+            <input type="text" id="search-hive-input" placeholder="Tìm theo ID thùng (VD: VB-023)..." 
+              class="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition">
+          </div>
+
+          <!-- Lọc trạng thái -->
+          <div>
+            <select id="filter-status" class="w-full py-2 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-500 text-slate-700">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="good">🟢 Bình thường (Tốt)</option>
+              <option value="warning">🟡 Cần theo dõi</option>
+              <option value="danger">🔴 Có vấn đề (Cảnh báo)</option>
+            </select>
+          </div>
+
+          <!-- Lọc khu vực -->
+          <div>
+            <select id="filter-zone" class="w-full py-2 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-500 text-slate-700">
+              <option value="all">Tất cả khu vực (A - D)</option>
+              <option value="A">Khu Vực A (32 thùng)</option>
+              <option value="B">Khu Vực B (32 thùng)</option>
+              <option value="C">Khu Vực C (32 thùng)</option>
+              <option value="D">Khu Vực D (32 thùng)</option>
+            </select>
+          </div>
+
+          <!-- Sắp xếp -->
+          <div>
+            <select id="sort-hive" class="w-full py-2 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-500 text-slate-700">
+              <option value="id">Sắp xếp: ID Thùng</option>
+              <option value="warning">Mức độ cảnh báo (Ưu tiên đỏ)</option>
+              <option value="temp">Nhiệt độ (Cao → Thấp)</option>
+              <option value="humidity">Độ ẩm (Cao → Thấp)</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+          <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Khỏe mạnh / Bình thường</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Chú ý / Cần theo dõi</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Cảnh báo can thiệp</span>
+          </div>
+          <span class="hidden sm:inline italic">Nhấp vào ô thùng để xem báo cáo cảm biến & camera</span>
+        </div>
+      </div>
+
+      <!-- BOX 3: Ma trận thùng ong -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs overflow-x-auto">
+        <div class="min-w-[680px]">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="grid" class="w-4 h-4 text-amber-500"></i> Ma Trận Thực Địa Bãi Ong (Khu Vực A-D)
+            </h3>
+            <span class="text-xs text-slate-400">Hiển thị trực quan 4 dãy x 8 cột = 32 thùng mẫu đại diện</span>
+          </div>
+
+          <!-- Matrix Table with Column and Row Labels -->
+          <div class="space-y-3" id="hive-matrix-container">
+            <!-- Dynamic Matrix populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- BOX 5: Các thùng ong có vấn đề -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-bold">⚠️</span>
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Box 5 — Các Thùng Ong Có Vấn Đề Cần Xử Lý Gấp</h3>
+              <p class="text-xs text-slate-500">Tự động phát hiện qua cảm biến nhiệt ẩm & camera AI tại cửa tổ</p>
+            </div>
+          </div>
+          <button onclick="filterWarningHives()" class="text-xs text-amber-600 hover:text-amber-700 font-bold">
+            Xem tất cả (6) →
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 uppercase text-[11px] font-bold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Mã Thùng</th>
+                <th class="py-3 px-4">Vị trí</th>
+                <th class="py-3 px-4">Vấn đề ghi nhận</th>
+                <th class="py-3 px-4">Mức độ</th>
+                <th class="py-3 px-4">Thời gian cảnh báo</th>
+                <th class="py-3 px-4 text-right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100" id="issue-table-body">
+              <!-- Issue Item 1 -->
+              <tr class="hover:bg-red-50/40 transition cursor-pointer" onclick="openHiveModal('VB-023')">
+                <td class="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-red-500"></span> VB-023
+                </td>
+                <td class="py-3.5 px-4 text-slate-600">Dãy A - Cột 05</td>
+                <td class="py-3.5 px-4 font-medium text-red-700">Nhiệt độ thùng vượt ngưỡng (37.2°C) - Nguy cơ sốc nhiệt</td>
+                <td class="py-3.5 px-4">
+                  <span class="px-2.5 py-1 rounded-full bg-red-100 text-red-800 font-bold text-[10px]">🔴 Cao</span>
+                </td>
+                <td class="py-3.5 px-4 text-slate-500">10 phút trước</td>
+                <td class="py-3.5 px-4 text-right">
+                  <span class="text-amber-600 hover:text-amber-700 font-bold">Chi tiết →</span>
+                </td>
+              </tr>
+              <!-- Issue Item 2 -->
+              <tr class="hover:bg-amber-50/40 transition cursor-pointer" onclick="openHiveModal('VB-041')">
+                <td class="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span> VB-041
+                </td>
+                <td class="py-3.5 px-4 text-slate-600">Dãy B - Cột 06</td>
+                <td class="py-3.5 px-4 font-medium text-amber-700">Độ ẩm bất thường (84%) - Khả năng bị đọng sương/thấm dột</td>
+                <td class="py-3.5 px-4">
+                  <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px]">🟡 Trung bình</span>
+                </td>
+                <td class="py-3.5 px-4 text-slate-500">35 phút trước</td>
+                <td class="py-3.5 px-4 text-right">
+                  <span class="text-amber-600 hover:text-amber-700 font-bold">Chi tiết →</span>
+                </td>
+              </tr>
+              <!-- Issue Item 3 -->
+              <tr class="hover:bg-amber-50/40 transition cursor-pointer" onclick="openHiveModal('VB-078')">
+                <td class="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span> VB-078
+                </td>
+                <td class="py-3.5 px-4 text-slate-600">Dãy C - Cột 02</td>
+                <td class="py-3.5 px-4 font-medium text-amber-700">Hoạt động bay về cửa tổ giảm 40% so với ngày hôm qua</td>
+                <td class="py-3.5 px-4">
+                  <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px]">🟡 Trung bình</span>
+                </td>
+                <td class="py-3.5 px-4 text-slate-500">1 giờ trước</td>
+                <td class="py-3.5 px-4 text-right">
+                  <span class="text-amber-600 hover:text-amber-700 font-bold">Chi tiết →</span>
+                </td>
+              </tr>
+              <!-- Issue Item 4 -->
+              <tr class="hover:bg-red-50/40 transition cursor-pointer" onclick="openHiveModal('VB-012')">
+                <td class="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-red-500"></span> VB-012
+                </td>
+                <td class="py-3.5 px-4 text-slate-600">Dãy A - Cột 02</td>
+                <td class="py-3.5 px-4 font-medium text-red-700">AI Camera phát hiện Ong Bắp Cày (Vespa) lượn lờ trước tổ</td>
+                <td class="py-3.5 px-4">
+                  <span class="px-2.5 py-1 rounded-full bg-red-100 text-red-800 font-bold text-[10px]">🔴 Cao</span>
+                </td>
+                <td class="py-3.5 px-4 text-slate-500">2 giờ trước</td>
+                <td class="py-3.5 px-4 text-right">
+                  <span class="text-amber-600 hover:text-amber-700 font-bold">Chi tiết →</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BOX 6: Thống kê nhanh đàn ong -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs">
+        <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
+          <span>📊</span> Box 6 — Thống Kê Phân Loại Đàn Ong
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-slate-800">
+            <div class="flex items-center justify-between text-xs text-amber-700 font-bold">
+              <span>🐝 Đàn mới</span>
+              <span class="text-base font-extrabold">12</span>
+            </div>
+            <p class="text-[11px] text-slate-600 mt-2">Đang ổn định tổ và nuôi ấu trùng đợt 1</p>
+          </div>
+          <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-slate-800">
+            <div class="flex items-center justify-between text-xs text-emerald-700 font-bold">
+              <span>🌱 Đang phát triển</span>
+              <span class="text-base font-extrabold">84</span>
+            </div>
+            <p class="text-[11px] text-slate-600 mt-2">Quân số mạnh, ong chúa đẻ đều</p>
+          </div>
+          <div class="p-4 rounded-xl bg-yellow-50 border border-yellow-200 text-slate-800">
+            <div class="flex items-center justify-between text-xs text-yellow-800 font-bold">
+              <span>🍯 Sắp thu hoạch</span>
+              <span class="text-base font-extrabold">18</span>
+            </div>
+            <p class="text-[11px] text-slate-600 mt-2">Cầu mật vít nắp trên 85% diện tích</p>
+          </div>
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-200 text-slate-800">
+            <div class="flex items-center justify-between text-xs text-blue-700 font-bold">
+              <span>📦 Đã thu hoạch</span>
+              <span class="text-base font-extrabold">14</span>
+            </div>
+            <p class="text-[11px] text-slate-600 mt-2">Đang dưỡng đàn và phục hồi cầu</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- 2.1 MODAL: CHI TIẾT THÙNG ONG (Đầy đủ tính năng theo yêu cầu) -->
+  <!-- ============================================================== -->
+  <div id="hive-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-4xl w-full max-h-[92vh] overflow-y-auto flex flex-col">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-200 sticky top-0 bg-white/95 backdrop-blur z-20 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="modal-status-badge" class="w-4 h-4 rounded-full bg-emerald-500 shadow-sm"></div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 id="modal-hive-id" class="text-xl font-extrabold text-slate-900">VB-023</h2>
+              <span id="modal-hive-tag" class="text-xs px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 font-bold">Cảnh báo</span>
+            </div>
+            <p id="modal-hive-sub" class="text-xs text-slate-500">Giống ong Ý (Apis mellifera) • Khu A - Hàng 1 Thùng 05</p>
+          </div>
+        </div>
+
+        <button onclick="closeHiveModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body Content -->
+      <div class="p-5 sm:p-6 space-y-6">
+        
+        <!-- Hàng 1: Nhiệt độ, Độ ẩm & Mã QR định danh -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <!-- Nhiệt độ hiện tại -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500">Nhiệt Độ Trong Thùng</span>
+              <span class="text-xl">🌡️</span>
+            </div>
+            <div class="my-2">
+              <span id="modal-temp" class="text-3xl font-black text-red-600">35.8°C</span>
+              <span class="text-xs text-slate-400 block mt-0.5">Ngưỡng chuẩn: 33.5°C - 35.0°C</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+              <div id="modal-temp-bar" class="bg-red-500 h-full rounded-full" style="width: 85%"></div>
+            </div>
+          </div>
+
+          <!-- Độ ẩm hiện tại -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500">Độ Ẩm Tương Đối</span>
+              <span class="text-xl">💧</span>
+            </div>
+            <div class="my-2">
+              <span id="modal-humidity" class="text-3xl font-black text-slate-900">78%</span>
+              <span class="text-xs text-slate-400 block mt-0.5">Ngưỡng chuẩn: 60% - 75%</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+              <div id="modal-hum-bar" class="bg-amber-500 h-full rounded-full" style="width: 78%"></div>
+            </div>
+          </div>
+
+          <!-- Mã QR Định Danh -->
+          <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/80 flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-amber-900 block">Mã QR Định Danh</span>
+              <span class="text-[11px] text-amber-700 block mt-0.5">Quét tại thực địa bãi ong</span>
+              <button onclick="copyHiveCode()" class="mt-3 inline-flex items-center gap-1 text-[11px] bg-white px-2.5 py-1 rounded-lg border border-amber-300 font-bold text-amber-800 hover:bg-amber-50">
+                <i data-lucide="copy" class="w-3 h-3"></i> Copy Token
+              </button>
+            </div>
+            <!-- SVG QR Code Giả lập sắc nét -->
+            <div class="w-20 h-20 bg-white p-1.5 rounded-xl border border-amber-300 shadow-xs flex items-center justify-center">
+              <svg viewBox="0 0 100 100" class="w-full h-full text-slate-900 fill-current">
+                <rect x="5" y="5" width="30" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="6"/>
+                <rect x="13" y="13" width="14" height="14" />
+                <rect x="65" y="5" width="30" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="6"/>
+                <rect x="73" y="13" width="14" height="14" />
+                <rect x="5" y="65" width="30" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="6"/>
+                <rect x="13" y="73" width="14" height="14" />
+                <!-- Random Matrix Dots -->
+                <rect x="42" y="10" width="8" height="8" />
+                <rect x="52" y="20" width="6" height="6" />
+                <rect x="42" y="42" width="16" height="16" rx="2" fill="#d97706" />
+                <rect x="68" y="45" width="10" height="8" />
+                <rect x="45" y="68" width="8" height="12" />
+                <rect x="70" y="72" width="18" height="8" />
+                <rect x="85" y="85" width="8" height="8" />
+              </svg>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Hàng 2: Ảnh phát hiện sinh vật lạ (AI Camera) -->
+        <div class="border border-slate-200 rounded-2xl p-4 bg-white">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">📸</span>
+              <h4 class="font-bold text-sm text-slate-900">Ảnh Phát Hiện Sinh Vật Lạ (AI Edge Camera)</h4>
+            </div>
+            <span id="modal-pest-status-badge" class="text-xs px-2.5 py-1 rounded-full font-bold bg-red-100 text-red-800">
+              Phát hiện dị vật
+            </span>
+          </div>
+
+          <div id="modal-pest-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <!-- Image Frame -->
+            <div class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-900 max-h-56 flex items-center justify-center">
+              <img id="modal-pest-img" src="https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80" 
+                alt="Camera cửa tổ" class="w-full h-48 object-cover opacity-90">
+              <!-- AI Bounding Box Overlay -->
+              <div id="modal-pest-box" class="absolute border-2 border-red-500 bg-red-500/20 rounded-md top-10 right-16 w-24 h-24 pointer-events-none flex flex-col justify-between p-1">
+                <span class="text-[9px] font-black bg-red-600 text-white px-1 rounded-xs inline-block">Ong bắp cày 94%</span>
+              </div>
+            </div>
+
+            <!-- Pest Diagnosis Details -->
+            <div class="space-y-2 text-xs text-slate-600">
+              <div class="p-3 bg-red-50 rounded-xl border border-red-100">
+                <p class="font-bold text-red-800 text-sm" id="modal-pest-title">Cảnh báo: Ong bắp cày (Vespa)</p>
+                <p class="text-red-700 mt-1" id="modal-pest-desc">Phát hiện ong bắp cày đang rình mồi tại bậc bay lúc 09:14. Ong thợ đã thu mình vào cửa hẹp.</p>
+              </div>
+              <p><strong>Khuyến nghị can thiệp:</strong> Lắp que chắn cửa hẹp 8mm hoặc đặt bẫy bả chua ngọt quanh dãy A.</p>
+            </div>
+          </div>
+
+          <!-- Safe State Alert (Khi không có sinh vật lạ) -->
+          <div id="modal-no-pest" class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+            <span class="text-2xl block mb-1">🛡️</span>
+            <p class="font-bold text-emerald-800 text-sm">An Toàn - Không Phát Hiện Sinh Vật Lạ Nào</p>
+            <p class="text-xs text-emerald-700 mt-0.5">Camera cửa tổ liên tục 24/7 ghi nhận nhịp độ ra vào bình thường, không có ong bắt cày hoặc thằn lằn.</p>
+          </div>
+        </div>
+
+        <!-- Hàng 3: Biểu đồ Nhiệt độ & Độ ẩm 24h -->
+        <div class="border border-slate-200 rounded-2xl p-4 bg-white">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h4 class="font-bold text-sm text-slate-900">Biểu Đồ Nhiệt Độ & Độ Ẩm (24 Giờ Qua)</h4>
+              <p class="text-xs text-slate-500">Dữ liệu telemetry cập nhật mỗi 5 phút từ vi điều khiển ESP32</p>
+            </div>
+            <div class="flex items-center gap-3 text-xs font-semibold">
+              <span class="flex items-center gap-1 text-red-500"><span class="w-3 h-1 bg-red-500 inline-block"></span> Nhiệt độ (°C)</span>
+              <span class="flex items-center gap-1 text-blue-500"><span class="w-3 h-1 bg-blue-500 inline-block"></span> Độ ẩm (%)</span>
+            </div>
+          </div>
+          <div class="relative h-56 w-full">
+            <canvas id="chart-hive-sensor"></canvas>
+          </div>
+        </div>
+
+        <!-- Hàng 4: Lịch sử ghi nhận & Form nhập liệu nhật ký -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          
+          <!-- Lịch sử ghi nhận -->
+          <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50">
+            <h4 class="font-bold text-sm text-slate-900 mb-3 flex items-center justify-between">
+              <span>📜 Lịch Sử Ghi Nhận / Nhật Ký Kiểm Thùng</span>
+              <span class="text-[10px] text-slate-400 font-normal">Tự động & thủ công</span>
+            </h4>
+            
+            <div id="modal-history-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1 text-xs">
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <div class="flex justify-between font-bold text-slate-800">
+                  <span>Kiểm tra định kỳ 7 ngày</span>
+                  <span class="text-slate-400 font-normal text-[10px]">Hôm nay, 08:30</span>
+                </div>
+                <p class="text-slate-600 mt-1">Ong chúa đẻ khỏe, 4 cầu nhộng vít nắp đều. Thêm tầng chân mới.</p>
+                <span class="text-[10px] text-emerald-600 font-medium">Bởi: KS. Nguyễn Văn Tuấn</span>
+              </div>
+
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <div class="flex justify-between font-bold text-amber-800">
+                  <span>Cảnh báo tăng nhiệt độ</span>
+                  <span class="text-slate-400 font-normal text-[10px]">Hôm qua, 13:45</span>
+                </div>
+                <p class="text-slate-600 mt-1">Nhiệt độ lên 36.2°C do nắng gắt chiếu trực tiếp mép thùng phía Tây.</p>
+                <span class="text-[10px] text-slate-500">Hệ thống IoT tự động ghi log</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form nhập liệu -->
+          <div class="border border-slate-200 rounded-2xl p-4 bg-white">
+            <h4 class="font-bold text-sm text-slate-900 mb-3 flex items-center gap-1.5">
+              <span>✍️</span> Nhập Liệu Nhật Ký Mới
+            </h4>
+
+            <form id="hive-log-form" onsubmit="submitHiveLog(event)" class="space-y-3 text-xs">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-slate-600 font-semibold mb-1">Nhiệt độ đo tay (°C)</label>
+                  <input type="number" step="0.1" id="input-log-temp" placeholder="VD: 34.5" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-500">
+                </div>
+                <div>
+                  <label class="block text-slate-600 font-semibold mb-1">Tình trạng ong chúa</label>
+                  <select id="input-log-queen" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-500">
+                    <option value="Tốt - Đẻ đều">Tốt - Đẻ đều</option>
+                    <option value="Kém - Đẻ thưa">Kém - Đẻ thưa</option>
+                    <option value="Mất chúa / Có mũ chúa">Mất chúa / Có mũ chúa</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-slate-600 font-semibold mb-1">Số cầu nhộng / mật</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="number" id="input-log-frames" placeholder="Số cầu quân: 4" class="p-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-500">
+                  <select id="input-log-honey-status" class="p-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-500">
+                    <option value="Vít nắp > 80% (Sẵn sàng quay)">Mật vít nắp > 80%</option>
+                    <option value="Mật non (Đang luyện)">Mật non</option>
+                    <option value="Thiếu thức ăn">Cần cho ăn bổ sung</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-slate-600 font-semibold mb-1">Ghi chú bổ sung</label>
+                <textarea id="input-log-note" rows="2" placeholder="Ghi nhận sinh vật lạ, tình trạng cơi nới tổ..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-500"></textarea>
+              </div>
+
+              <div class="flex justify-end pt-1">
+                <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-xs transition flex items-center gap-1.5">
+                  <i data-lucide="save" class="w-3.5 h-3.5"></i> Lưu Nhật Ký
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Notification Toast Box -->
+  <div id="toast-box" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl flex items-center gap-2">
+    <span id="toast-icon">✅</span>
+    <span id="toast-message">Đã lưu thành công</span>
+  </div>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    /* ==============================================================
+       DATA MOCK: 128 Hives Simulation Data
+       ============================================================== */
+    const ROWS = ['A', 'B', 'C', 'D'];
+    const COLS_COUNT = 8; // Represenative matrix 4 rows x 8 cols = 32 per zone view, scaling for total 128
+    
+    // Detailed database of mock hives
+    const hivesData = {};
+
+    // Specific problem hives defined according to prompt
+    const problemHiveIds = {
+      'VB-023': { status: 'danger', temp: 37.2, hum: 78, issue: 'Nhiệt độ cao', time: '10 phút trước', pest: true, pestName: 'Ong bắp cày' },
+      'VB-041': { status: 'warning', temp: 34.0, hum: 84, issue: 'Độ ẩm bất thường', time: '35 phút trước', pest: false },
+      'VB-078': { status: 'warning', temp: 33.8, hum: 70, issue: 'Hoạt động giảm', time: '1 giờ trước', pest: false },
+      'VB-012': { status: 'danger', temp: 35.5, hum: 72, issue: 'Sinh vật lạ xâm nhập', time: '2 giờ trước', pest: true, pestName: 'Ong bắp cày' },
+      'VB-005': { status: 'danger', temp: 37.8, hum: 76, issue: 'Nhiệt độ cao nguy cấp', time: '15 phút trước', pest: false },
+      'VB-099': { status: 'danger', temp: 32.1, hum: 89, issue: 'Độ ẩm quá cao - úng mốc', time: '40 phút trước', pest: false },
+      'VB-054': { status: 'danger', temp: 36.9, hum: 75, issue: 'Báo động âm thanh hỗn loạn', time: '5 phút trước', pest: true, pestName: 'Thằn lằn cửa tổ' },
+      'VB-033': { status: 'warning', temp: 35.1, hum: 79, issue: 'Quân số thưa thớt', time: '3 giờ trước', pest: false },
+      'VB-062': { status: 'warning', temp: 34.8, hum: 81, issue: 'Cần nới rộng tầng kế', time: '4 giờ trước', pest: false },
+      'VB-088': { status: 'warning', temp: 34.2, hum: 80, issue: 'Độ ẩm sáng sớm cao', time: '6 giờ trước', pest: false },
+    };
+
+    // Pre-populate 128 Hives
+    let counter = 1;
+    ROWS.forEach(row => {
+      for (let col = 1; col <= 32; col++) {
+        const id = `VB-${String(counter).padStart(3, '0')}`;
+        let status = 'good';
+        let temp = (33.8 + Math.random() * 1.0).toFixed(1);
+        let hum = Math.floor(65 + Math.random() * 8);
+        let pest = false;
+        let pestName = '';
+        let issue = 'Bình thường';
+        let time = 'Vừa cập nhật';
+
+        if (problemHiveIds[id]) {
+          status = problemHiveIds[id].status;
+          temp = problemHiveIds[id].temp;
+          hum = problemHiveIds[id].hum;
+          pest = problemHiveIds[id].pest;
+          pestName = problemHiveIds[id].pestName || '';
+          issue = problemHiveIds[id].issue;
+          time = problemHiveIds[id].time;
+        }
+
+        hivesData[id] = {
+          id,
+          row,
+          col,
+          zone: row, // A, B, C, D
+          status,
+          temp,
+          hum,
+          pest,
+          pestName,
+          issue,
+          time,
+          queenStatus: 'Tốt - Đẻ đều',
+          frames: 4,
+          history: [
+            { title: 'Kiểm tra gần nhất', time: 'Hôm nay 08:30', note: 'Ong chăm chỉ, không phát hiện rệp ve Varroa.', author: 'KS. Tuấn' }
+          ]
+        };
+        counter++;
+      }
+    });
+
+    // Charts variables
+    let chartColonies, chartStatus, chartHoney, chartRevenue, chartHiveSensor;
+
+    function initHomeCharts() {
+      const months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
+
+      // 1. Chart: Số lượng đàn trong năm (Box 4)
+      const ctxColonies = document.getElementById('chart-colonies').getContext('2d');
+      chartColonies = new Chart(ctxColonies, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Số lượng đàn ong',
+            data: [75, 82, 90, 96, 102, 108, 110, 114, 118, 122, 125, 128],
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+            fill: true,
+            tension: 0.35,
+            borderWidth: 3,
+            pointBackgroundColor: '#d97706',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { min: 60, max: 140, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 2. Chart: Trạng thái đàn (Box 7 - Donut)
+      const ctxStatus = document.getElementById('chart-status').getContext('2d');
+      chartStatus = new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+          labels: ['Khỏe mạnh (112)', 'Cần theo dõi (10)', 'Có vấn đề (6)'],
+          datasets: [{
+            data: [112, 10, 6],
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } }
+          },
+          cutout: '72%'
+        }
+      });
+
+      // 3. Chart: Sản lượng mật (Box 5 - Bar)
+      const ctxHoney = document.getElementById('chart-honey').getContext('2d');
+      chartHoney = new Chart(ctxHoney, {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Sản lượng (kg)',
+            data: [120, 150, 210, 310, 380, 420, 390, 280, 230, 210, 190, 160],
+            backgroundColor: '#fbbf24',
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 4. Chart: Doanh thu (Box 6 - Line)
+      const ctxRev = document.getElementById('chart-revenue').getContext('2d');
+      chartRevenue = new Chart(ctxRev, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Doanh thu (Tr. VNĐ)',
+            data: [8.5, 11.2, 16.5, 24.8, 30.5, 33.6, 29.2, 21.0, 17.5, 15.0, 13.2, 11.5],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.35,
+            borderWidth: 3,
+            pointBackgroundColor: '#059669',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function renderHiveMatrix() {
+      const container = document.getElementById('hive-matrix-container');
+      const searchQuery = document.getElementById('search-hive-input').value.toUpperCase().trim();
+      const statusFilter = document.getElementById('filter-status').value;
+      const zoneFilter = document.getElementById('filter-zone').value;
+
+      let html = '';
+
+      // Column Header numbers (01 -> 08)
+      html += `<div class="grid grid-cols-9 gap-2 text-center text-xs font-bold text-slate-400 pb-1 border-b border-slate-100">
+        <div class="text-left font-extrabold text-slate-600">Dãy \\ Cột</div>`;
+      for (let c = 1; c <= 8; c++) {
+        html += `<div>${String(c).padStart(2, '0')}</div>`;
+      }
+      html += `</div>`;
+
+      // Rows A, B, C, D
+      const displayRows = zoneFilter === 'all' ? ['A', 'B', 'C', 'D'] : [zoneFilter];
+
+      displayRows.forEach(rowLetter => {
+        html += `<div class="grid grid-cols-9 gap-2 items-center py-1.5">
+          <div class="font-extrabold text-slate-800 text-sm flex items-center gap-1">
+            <span class="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center">${rowLetter}</span>
+          </div>`;
+
+        for (let colNum = 1; colNum <= 8; colNum++) {
+          // Calculate Hive ID: Row A (1-8), Row B (9-16), etc.
+          let rowOffset = (ROWS.indexOf(rowLetter)) * 32;
+          let hiveIdx = rowOffset + colNum;
+          let id = `VB-${String(hiveIdx).padStart(3, '0')}`;
+          let data = hivesData[id] || { id, status: 'good', temp: '34.2', hum: '68' };
+
+          // Filter evaluation
+          let matchesSearch = !searchQuery || id.includes(searchQuery);
+          let matchesStatus = (statusFilter === 'all') || 
+                              (statusFilter === 'good' && data.status === 'good') ||
+                              (statusFilter === 'warning' && data.status === 'warning') ||
+                              (statusFilter === 'danger' && data.status === 'danger');
+
+          let opacityClass = (matchesSearch && matchesStatus) ? 'opacity-100' : 'opacity-20';
+
+          // Color tokens strictly for status as requested
+          let bgStatus = 'bg-emerald-500 hover:bg-emerald-600';
+          let emojiStatus = '🟢';
+          let ringColor = 'ring-emerald-400';
+
+          if (data.status === 'warning') {
+            bgStatus = 'bg-amber-400 hover:bg-amber-500 animate-pulse';
+            emojiStatus = '🟡';
+            ringColor = 'ring-amber-400';
+          } else if (data.status === 'danger') {
+            bgStatus = 'bg-red-500 hover:bg-red-600 animate-bounce';
+            emojiStatus = '🔴';
+            ringColor = 'ring-red-400';
+          }
+
+          html += `
+            <div class="relative group hive-cell ${opacityClass}">
+              <button onclick="openHiveModal('${data.id}')" 
+                class="w-full py-2.5 rounded-xl border border-slate-200/90 flex flex-col items-center justify-center bg-white shadow-2xs hover:shadow-md transition">
+                <span class="text-base">${emojiStatus}</span>
+                <span class="text-[10px] font-bold text-slate-700 tracking-tighter mt-0.5">${data.id}</span>
+              </button>
+
+              <!-- Hover Tooltip Preview Card -->
+              <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30 w-48 bg-slate-900 text-white rounded-xl p-3 shadow-xl text-left pointer-events-none">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-1.5 mb-1.5">
+                  <span class="font-extrabold text-amber-400">${data.id}</span>
+                  <span class="text-[10px]">${data.status === 'good' ? '🟢 Bình thường' : (data.status === 'warning' ? '🟡 Cần theo dõi' : '🔴 Cảnh báo')}</span>
+                </div>
+                <div class="space-y-0.5 text-[11px] text-slate-300">
+                  <p>🌡️ Nhiệt độ: <strong class="text-white">${data.temp}°C</strong></p>
+                  <p>💧 Độ ẩm: <strong class="text-white">${data.hum}%</strong></p>
+                  <p>🐝 Vị trí: Dãy ${data.row} - Thùng ${data.col}</p>
+                </div>
+                <div class="text-[10px] text-amber-400 mt-2 font-bold text-right">Xem chi tiết →</div>
+              </div>
+            </div>
+          `;
+        }
+        html += `</div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    let activeHiveId = 'VB-023';
+
+    function openHiveModal(hiveId) {
+      const data = hivesData[hiveId] || {
+        id: hiveId,
+        status: 'good',
+        temp: 34.2,
+        hum: 70,
+        pest: false,
+        pestName: '',
+        issue: 'Bình thường',
+        row: 'A',
+        col: 5,
+        history: []
+      };
+
+      activeHiveId = hiveId;
+
+      // Populate Elements
+      document.getElementById('modal-hive-id').textContent = data.id;
+      document.getElementById('modal-temp').textContent = `${data.temp}°C`;
+      document.getElementById('modal-humidity').textContent = `${data.hum}%`;
+      document.getElementById('modal-hive-sub').textContent = `Giống ong Ý thuần • Khu vực ${data.row} - Thùng ${String(data.col).padStart(2, '0')}`;
+
+      // Progress bars
+      const tempPercent = Math.min(100, Math.max(10, ((data.temp - 25) / 20) * 100));
+      document.getElementById('modal-temp-bar').style.width = `${tempPercent}%`;
+      document.getElementById('modal-hum-bar').style.width = `${data.hum}%`;
+
+      // Status Badge & Color
+      const badge = document.getElementById('modal-status-badge');
+      const tag = document.getElementById('modal-hive-tag');
+      if (data.status === 'danger') {
+        badge.className = 'w-4 h-4 rounded-full bg-red-500 shadow-sm animate-pulse';
+        tag.className = 'text-xs px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 font-bold';
+        tag.textContent = '🔴 Cảnh báo khẩn';
+        document.getElementById('modal-temp').className = 'text-3xl font-black text-red-600';
+      } else if (data.status === 'warning') {
+        badge.className = 'w-4 h-4 rounded-full bg-amber-500 shadow-sm';
+        tag.className = 'text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold';
+        tag.textContent = '🟡 Cần theo dõi';
+        document.getElementById('modal-temp').className = 'text-3xl font-black text-amber-600';
+      } else {
+        badge.className = 'w-4 h-4 rounded-full bg-emerald-500 shadow-sm';
+        tag.className = 'text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold';
+        tag.textContent = '🟢 Khỏe mạnh';
+        document.getElementById('modal-temp').className = 'text-3xl font-black text-slate-900';
+      }
+
+      // Sinh vật lạ (Pest detection logic requested: if found, show photo; if none, show clean safe view)
+      const pestContainer = document.getElementById('modal-pest-container');
+      const noPestContainer = document.getElementById('modal-no-pest');
+      const pestBadge = document.getElementById('modal-pest-status-badge');
+
+      if (data.pest) {
+        pestContainer.classList.remove('hidden');
+        noPestContainer.classList.add('hidden');
+        pestBadge.className = 'text-xs px-2.5 py-1 rounded-full font-bold bg-red-100 text-red-800';
+        pestBadge.textContent = `Phát hiện: ${data.pestName || 'Sinh vật lạ'}`;
+        document.getElementById('modal-pest-title').textContent = `Cảnh báo: ${data.pestName || 'Sinh vật lạ tại cửa tổ'}`;
+        document.getElementById('modal-pest-desc').textContent = `AI Camera đã phát hiện chuyển động bất thường và phân loại ${data.pestName}. Cần kiểm tra tấm chắn cửa tổ.`;
+      } else {
+        pestContainer.classList.add('hidden');
+        noPestContainer.classList.remove('hidden');
+        pestBadge.className = 'text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800';
+        pestBadge.textContent = 'An toàn - Không có sinh vật lạ';
+      }
+
+      // Populate History List
+      renderModalHistory(data);
+
+      // Render Sensor Chart for 24h
+      renderHiveSensorChart(data);
+
+      // Show Modal
+      document.getElementById('hive-modal').classList.remove('hidden');
+    }
+
+    function closeHiveModal() {
+      document.getElementById('hive-modal').classList.add('hidden');
+    }
+
+    function renderModalHistory(data) {
+      const listEl = document.getElementById('modal-history-list');
+      let html = '';
+      if (!data.history || data.history.length === 0) {
+        html = `<p class="text-slate-400 italic">Chưa có nhật ký ghi chép nào.</p>`;
+      } else {
+        data.history.forEach(item => {
+          html += `
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+              <div class="flex justify-between font-bold text-slate-800">
+                <span>${item.title}</span>
+                <span class="text-slate-400 font-normal text-[10px]">${item.time}</span>
+              </div>
+              <p class="text-slate-600 mt-1">${item.note}</p>
+              <span class="text-[10px] text-amber-700 font-semibold">${item.author || 'Hệ thống'}</span>
+            </div>
+          `;
+        });
+      }
+      listEl.innerHTML = html;
+    }
+
+    function renderHiveSensorChart(data) {
+      const ctx = document.getElementById('chart-hive-sensor').getContext('2d');
+      const hours = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
+      
+      const baseTemp = parseFloat(data.temp);
+      const baseHum = parseFloat(data.hum);
+
+      const tempData = hours.map((_, i) => (baseTemp - 1.5 + Math.sin(i) * 1.8).toFixed(1));
+      const humData = hours.map((_, i) => Math.min(95, Math.max(50, Math.round(baseHum + Math.cos(i) * 6))));
+
+      if (chartHiveSensor) {
+        chartHiveSensor.destroy();
+      }
+
+      chartHiveSensor = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: hours,
+          datasets: [
+            {
+              label: 'Nhiệt độ (°C)',
+              data: tempData,
+              borderColor: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.08)',
+              yAxisID: 'yTemp',
+              tension: 0.35,
+              borderWidth: 2.5,
+              pointRadius: 3
+            },
+            {
+              label: 'Độ ẩm (%)',
+              data: humData,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.08)',
+              yAxisID: 'yHum',
+              tension: 0.35,
+              borderWidth: 2.5,
+              pointRadius: 3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            yTemp: {
+              type: 'linear',
+              position: 'left',
+              min: 28,
+              max: 42,
+              ticks: { callback: v => v + '°C' }
+            },
+            yHum: {
+              type: 'linear',
+              position: 'right',
+              min: 40,
+              max: 100,
+              grid: { drawOnChartArea: false },
+              ticks: { callback: v => v + '%' }
+            }
+          }
+        }
+      });
+    }
+
+    // Submit Hive Inspection Log
+    function submitHiveLog(e) {
+      e.preventDefault();
+      const tempManual = document.getElementById('input-log-temp').value;
+      const queenStatus = document.getElementById('input-log-queen').value;
+      const frames = document.getElementById('input-log-frames').value || '4';
+      const honeyStatus = document.getElementById('input-log-honey-status').value;
+      const note = document.getElementById('input-log-note').value.trim();
+
+      const newLog = {
+        title: `Nhật ký: ${queenStatus} (${frames} cầu)`,
+        time: 'Vừa xong',
+        note: note ? `${note} - ${honeyStatus}` : `Tình trạng mật: ${honeyStatus}.`,
+        author: 'KS. Tuấn'
+      };
+
+      if (!hivesData[activeHiveId].history) {
+        hivesData[activeHiveId].history = [];
+      }
+      hivesData[activeHiveId].history.unshift(newLog);
+
+      if (tempManual) {
+        hivesData[activeHiveId].temp = parseFloat(tempManual).toFixed(1);
+        document.getElementById('modal-temp').textContent = `${hivesData[activeHiveId].temp}°C`;
+      }
+
+      // Re-render
+      renderModalHistory(hivesData[activeHiveId]);
+      document.getElementById('hive-log-form').reset();
+      showToast('Đã lưu nhật ký kiểm tra thành công!');
+    }
+
+    // Helper: Toast message
+    function showToast(msg) {
+      const toast = document.getElementById('toast-box');
+      document.getElementById('toast-message').textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2600);
+    }
+
+    // Copy Token
+    function copyHiveCode() {
+      const dummy = document.createElement('input');
+      dummy.value = `VIETBEE-ID-${activeHiveId}-SECRET-KEY`;
+      document.body.appendChild(dummy);
+      dummy.select();
+      document.execCommand('copy');
+      document.body.removeChild(dummy);
+      showToast(`Đã sao chép mã định danh: ${activeHiveId}`);
+    }
+
+    function switchPage(page) {
+      const homePage = document.getElementById('page-home');
+      const hivesPage = document.getElementById('page-hives');
+      
+      const navHome = document.getElementById('nav-home');
+      const navHives = document.getElementById('nav-hives');
+      const mobNavHome = document.getElementById('mob-nav-home');
+      const mobNavHives = document.getElementById('mob-nav-hives');
+
+      if (page === 'home') {
+        homePage.classList.remove('hidden');
+        hivesPage.classList.add('hidden');
+
+        navHome.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition bg-white text-slate-900 shadow-xs';
+        navHives.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-600 hover:text-slate-900';
+
+        mobNavHome.className = 'flex-1 py-3 text-sm font-semibold text-center border-b-2 border-amber-500 text-amber-600';
+        mobNavHives.className = 'flex-1 py-3 text-sm font-semibold text-center border-b-2 border-transparent text-slate-500';
+      } else {
+        homePage.classList.add('hidden');
+        hivesPage.classList.remove('hidden');
+
+        navHives.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition bg-white text-slate-900 shadow-xs';
+        navHome.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-600 hover:text-slate-900';
+
+        mobNavHives.className = 'flex-1 py-3 text-sm font-semibold text-center border-b-2 border-amber-500 text-amber-600';
+        mobNavHome.className = 'flex-1 py-3 text-sm font-semibold text-center border-b-2 border-transparent text-slate-500';
+
+        renderHiveMatrix();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function filterWarningHives() {
+      switchPage('hives');
+      document.getElementById('filter-status').value = 'danger';
+      renderHiveMatrix();
+    }
+
+    // Notification dropdown toggle
+    document.getElementById('notif-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const drop = document.getElementById('notif-dropdown');
+      drop.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+      document.getElementById('notif-dropdown').classList.add('hidden');
+    });
+
+    // Filtering & Search Inputs Listener
+    document.getElementById('search-hive-input').addEventListener('input', renderHiveMatrix);
+    document.getElementById('filter-status').addEventListener('change', renderHiveMatrix);
+    document.getElementById('filter-zone').addEventListener('change', renderHiveMatrix);
+    document.getElementById('sort-hive').addEventListener('change', renderHiveMatrix);
+
+    // Initial onload execution
+    window.onload = function() {
+      initHomeCharts();
+      renderHiveMatrix();
+    };
+  </script>
+</body>
+</html>
