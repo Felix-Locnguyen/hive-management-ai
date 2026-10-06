@@ -8,7 +8,6 @@ venv/
 *.pt
 *.onnx
 *.engine
-!ai_engine/data/.gitkeep
 
 # Node / Frontend
 node_modules/
