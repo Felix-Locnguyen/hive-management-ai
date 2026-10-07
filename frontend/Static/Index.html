@@ -174,6 +174,13 @@
     }
     .input-icon > .field { padding-left: 2.25rem; }
 
+    .err-msg {
+      display: block;
+      font-size: .75rem;
+      color: #E11D48;
+      margin-top: .375rem;
+    }
+
     /* --- Chip / filter pills (horizontally scrollable on mobile) ---------- */
     .chip-row {
       display: flex;
@@ -396,6 +403,348 @@
       z-index: 20;
     }
     @media (min-width: 640px) { .sticky-filters { top: 4rem; } }
+
+    /* =========================================================================
+       ACCOUNT / SETTINGS SCREEN
+       Mobile-first, iOS-inspired. Vanilla CSS + design tokens (namespace "acc-")
+       ========================================================================= */
+    :root {
+      --acc-bg: #F6F6F8;
+      --acc-card: #FFFFFF;
+      --acc-text: #1C1C1E;
+      --acc-text-2: #6E6E73;
+      --acc-text-3: #9A9AA0;
+      --acc-divider: rgba(60, 60, 67, .11);
+      --acc-accent: #1B4332;
+      --acc-accent-soft: rgba(27, 67, 50, .09);
+      --acc-danger: #E5484D;
+      --acc-radius-card: 16px;
+      --acc-radius-btn: 14px;
+      --acc-row-h: 56px;
+      --acc-icon-col: 50px; /* 16 padding + 20 icon + 14 gap */
+    }
+
+    body.acc-mode { background: var(--acc-bg); }
+
+    .acc-page {
+      width: 100%;
+      max-width: 480px;
+      margin-inline: auto;
+      padding: 0 8px 8px; /* main px-3 (12) + 8 = 20px horizontal */
+    }
+
+    .acc-h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      line-height: 1.25;
+      color: var(--acc-text);
+      margin: 4px 0 16px;
+      padding-inline: 4px;
+    }
+
+    /* --- Profile card ----------------------------------------------------- */
+    .acc-profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 16px;
+      background: var(--acc-card);
+      border: 1px solid var(--acc-divider);
+      border-radius: var(--acc-radius-card);
+      margin-top: 4px;
+    }
+    .acc-avatar {
+      flex: none;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #EDEDF1;
+      color: var(--acc-text-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .acc-avatar svg { width: 30px; height: 30px; }
+    .acc-pinfo { flex: 1; min-width: 0; }
+    .acc-pname {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -.01em;
+      color: var(--acc-text);
+      overflow-wrap: anywhere;
+    }
+    .acc-pmail {
+      font-size: 13px;
+      line-height: 1.35;
+      color: var(--acc-text-2);
+      margin-top: 2px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .acc-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 8px;
+      padding: 3px 7px;
+      border-radius: 6px;
+      background: var(--acc-accent-soft);
+      color: var(--acc-accent);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+    .acc-edit {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--acc-divider);
+      background: var(--acc-card);
+      color: var(--acc-text-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color .15s ease, color .15s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .acc-edit:hover { color: var(--acc-accent); }
+    .acc-edit:active { background: var(--acc-bg); }
+    .acc-edit:focus-visible { outline: 2px solid var(--acc-accent); outline-offset: 2px; }
+    .acc-edit svg { width: 16px; height: 16px; }
+
+    /* --- Section titles --------------------------------------------------- */
+    .acc-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--acc-text-3);
+      margin: 26px 0 8px;
+      padding-inline: 4px;
+    }
+
+    /* --- Cards + rows ----------------------------------------------------- */
+    .acc-card {
+      background: var(--acc-card);
+      border: 1px solid var(--acc-divider);
+      border-radius: var(--acc-radius-card);
+      overflow: hidden;
+    }
+    .acc-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      min-height: var(--acc-row-h);
+      padding: 8px 16px;
+      margin: 0;
+      background: none;
+      border: 0;
+      font: inherit;
+      color: var(--acc-text);
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background-color .12s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .acc-row:not(:first-child)::before {
+      content: "";
+      position: absolute;
+      left: var(--acc-icon-col);
+      right: 0;
+      top: 0;
+      height: 1px;
+      background: var(--acc-divider);
+    }
+    .acc-row:active { background: rgba(0, 0, 0, .04); }
+    .acc-row:focus-visible { outline: 2px solid var(--acc-accent); outline-offset: -2px; }
+    .acc-ico {
+      flex: none;
+      width: 20px;
+      height: 20px;
+      color: var(--acc-text-2);
+      display: block;
+    }
+    .acc-ico svg { width: 20px; height: 20px; display: block; }
+    .acc-label {
+      flex: 1;
+      min-width: 0;
+      font-size: 15px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .acc-value { flex: none; font-size: 14px; color: var(--acc-text-2); }
+    .acc-note { flex: none; font-size: 14px; color: var(--acc-text-3); }
+    .acc-chev { flex: none; width: 16px; height: 16px; color: #C6C6CB; }
+
+    /* --- Toggle switch (51 x 31, pure CSS) -------------------------------- */
+    .acc-switch {
+      position: relative;
+      flex: none;
+      width: 51px;
+      height: 31px;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: #E9E9EA;
+      cursor: pointer;
+      transition: background-color .2s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .acc-switch::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 27px;
+      height: 27px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, .15), 0 0 1px rgba(0, 0, 0, .22);
+      transition: transform .2s cubic-bezier(.4, .2, .2, 1);
+    }
+    .acc-switch[aria-checked="true"] { background: var(--acc-accent); }
+    .acc-switch[aria-checked="true"]::after { transform: translateX(20px); }
+    .acc-switch:focus-visible { outline: 2px solid var(--acc-accent); outline-offset: 2px; }
+
+    /* --- Actions ---------------------------------------------------------- */
+    .acc-logout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 52px;
+      margin-top: 26px;
+      background: var(--acc-card);
+      border: 1px solid var(--acc-divider);
+      border-radius: var(--acc-radius-btn);
+      color: var(--acc-danger);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color .12s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .acc-logout:active { background: var(--acc-bg); }
+    .acc-logout:focus-visible { outline: 2px solid var(--acc-danger); outline-offset: 2px; }
+
+    .acc-delete {
+      display: block;
+      width: 100%;
+      margin-top: 16px;
+      padding: 8px;
+      background: none;
+      border: 0;
+      border-radius: 10px;
+      color: var(--acc-danger);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color .12s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .acc-delete:active { background: rgba(229, 72, 77, .08); }
+    .acc-delete:focus-visible { outline: 2px solid var(--acc-danger); outline-offset: 2px; }
+
+    .acc-version {
+      margin: 12px 0 4px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--acc-text-3);
+    }
+
+    /* --- Confirm dialog (iOS-style alert) --------------------------------- */
+    .acc-alert-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15, 23, 42, .38);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .18s ease, visibility .18s ease;
+    }
+    .acc-alert-overlay.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .acc-alert {
+      width: 100%;
+      max-width: 300px;
+      background: rgba(255, 255, 255, .97);
+      border-radius: 16px;
+      overflow: hidden;
+      text-align: center;
+      box-shadow: 0 24px 48px -12px rgba(15, 23, 42, .3);
+      transform: scale(.94);
+      transition: transform .18s cubic-bezier(.32, .72, 0, 1);
+    }
+    .acc-alert-overlay.is-open .acc-alert { transform: scale(1); }
+    .acc-alert-body { padding: 20px 18px 16px; }
+    .acc-alert-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      color: var(--acc-text);
+    }
+    .acc-alert-msg {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--acc-text-2);
+      margin-top: 6px;
+    }
+    .acc-alert-msg strong { color: var(--acc-danger); font-weight: 700; }
+    .acc-alert-actions { display: flex; border-top: 1px solid var(--acc-divider); }
+    .acc-alert-actions.is-stacked { flex-direction: column; }
+    .acc-alert-btn {
+      flex: 1;
+      min-height: 46px;
+      padding: 0 10px;
+      background: none;
+      border: 0;
+      font-size: 15px;
+      color: var(--acc-accent);
+      cursor: pointer;
+      transition: background-color .12s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .acc-alert-btn:active { background: rgba(0, 0, 0, .05); }
+    .acc-alert-btn:focus-visible { outline: 2px solid var(--acc-accent); outline-offset: -2px; }
+    .acc-alert-btn + .acc-alert-btn { border-left: 1px solid var(--acc-divider); }
+    .acc-alert-actions.is-stacked .acc-alert-btn + .acc-alert-btn {
+      border-left: 0;
+      border-top: 1px solid var(--acc-divider);
+    }
+    .acc-alert-btn.is-muted { color: var(--acc-text-2); font-weight: 600; }
+    .acc-alert-btn.is-danger { color: var(--acc-danger); font-weight: 700; }
+
+    body.acc-alert-open { overflow: hidden; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .acc-alert-overlay, .acc-alert, .acc-switch, .acc-switch::after { transition-duration: .001ms !important; }
+    }
   </style>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 antialiased selection:bg-brand selection:text-white">
@@ -510,6 +859,13 @@
               </div>
             </div>
           </div>
+
+          <!-- Account / Settings entry (visible on every breakpoint, incl. lg+) -->
+          <button type="button" onclick="switchPage('account')" class="w-9 h-9 rounded-full border border-slate-200 text-slate-500 hover:text-brand hover:border-brand/30 hover:bg-brand-50 transition flex items-center justify-center shrink-0" aria-label="Tài khoản và cài đặt">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </button>
         </div>
 
       </div>
@@ -609,16 +965,17 @@
       </div>
     </div>
 
-    <!-- Drawer footer: user profile -->
-    <div class="p-4 border-t border-slate-100 bg-slate-50/70">
-      <div class="flex items-center gap-3">
-        <span class="w-9 h-9 rounded-full bg-brand-50 border border-brand/20 flex items-center justify-center text-brand font-bold text-xs shrink-0" aria-hidden="true">NB</span>
-        <span class="min-w-0">
-          <span class="block text-xs font-semibold text-slate-800 leading-tight truncate">Kỹ Sư Nguyễn Bình</span>
-          <span class="block text-[11px] text-slate-500 leading-tight truncate">Quản đốc Trại Sơn La</span>
-        </span>
-      </div>
-    </div>
+    <!-- Drawer footer: user profile → opens Account / Settings -->
+    <button type="button" onclick="navigateAndClose('account')" class="w-full p-4 border-t border-slate-100 bg-slate-50/70 flex items-center gap-3 text-left hover:bg-slate-100 transition active:bg-slate-200" aria-label="Mở trang Tài khoản">
+      <span class="w-9 h-9 rounded-full bg-brand-50 border border-brand/20 flex items-center justify-center text-brand font-bold text-xs shrink-0" aria-hidden="true">NB</span>
+      <span class="min-w-0 flex-1">
+        <span class="block text-xs font-semibold text-slate-800 leading-tight truncate">Kỹ Sư Nguyễn Bình</span>
+        <span class="block text-[11px] text-slate-500 leading-tight truncate">Quản đốc Trại Sơn La</span>
+      </span>
+      <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
   </aside>
 
   <!-- MAIN CONTAINER (Added padding bottom for Mobile Bar) -->
@@ -1539,6 +1896,134 @@
 
     </section>
 
+    <!-- ========================================================================= -->
+    <!-- 5. TÀI KHOẢN & CÀI ĐẶT (Account / Settings) -->
+    <!-- ========================================================================= -->
+    <section id="page-account" class="hidden acc-page">
+
+      <!-- Page header: app header only shows the title below md -->
+      <h1 class="acc-h1 hidden md:block">Tài khoản</h1>
+
+      <!-- Profile card -->
+      <div class="acc-profile">
+        <span class="acc-avatar" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </span>
+
+        <div class="acc-pinfo">
+          <div class="acc-pname" id="acc-name">Felix Nguyen</div>
+          <div class="acc-pmail" id="acc-email">locnguyenapp@gmail.com</div>
+          <span class="acc-badge">PRO MEMBER</span>
+        </div>
+
+        <button type="button" class="acc-edit" onclick="openProfileModal()" aria-label="Chỉnh sửa hồ sơ">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 20h9" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- SECTION 1 -->
+      <p class="acc-section-title">Bảo mật &amp; Đăng nhập</p>
+      <div class="acc-card">
+        <button type="button" class="acc-row" onclick="accRowInfo('Đổi mật khẩu')">
+          <span class="acc-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" /><path stroke-linecap="round" stroke-linejoin="round" d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+          </span>
+          <span class="acc-label">Đổi mật khẩu</span>
+          <svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6" /></svg>
+        </button>
+
+        <div class="acc-row" onclick="toggleBiometric(event)">
+          <span class="acc-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+          </span>
+          <span class="acc-label">Đăng nhập Face ID/Vân tay</span>
+          <button type="button" class="acc-switch" id="acc-switch-biometric" role="switch" aria-checked="true" aria-label="Đăng nhập bằng Face ID hoặc vân tay"></button>
+        </div>
+
+        <button type="button" class="acc-row" onclick="accRowInfo('Thiết bị đang đăng nhập')">
+          <span class="acc-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2" /><path d="M8 21h8M12 18v3" /></svg>
+          </span>
+          <span class="acc-label">Thiết bị đang đăng nhập</span>
+          <svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6" /></svg>
+        </button>
+      </div>
+
+      <!-- SECTION 2 -->
+      <p class="acc-section-title">Cài đặt ứng dụng</p>
+      <div class="acc-card">
+        <button type="button" class="acc-row" onclick="accRowInfo('Thông báo đẩy')">
+          <span class="acc-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
+          </span>
+          <span class="acc-label">Thông báo đẩy</span>
+          <svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6" /></svg>
+        </button>
+
+        <button type="button" class="acc-row" onclick="accRowInfo('Ngôn ngữ')">
+          <span class="acc-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M2 12h20" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+          </span>
+          <span class="acc-label">Ngôn ngữ</span>
+          <span class="acc-value">Tiếng Việt</span>
+          <svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6" /></svg>
+        </button>
+
+        <div class="acc-row" onclick="attemptDarkMode(event)">
+          <span class="acc-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+          </span>
+          <span class="acc-label">Giao diện tối</span>
+          <button type="button" class="acc-switch" id="acc-switch-dark" role="switch" aria-checked="false" aria-label="Bật giao diện tối"></button>
+        </div>
+
+        <button type="button" class="acc-row" onclick="confirmClearCache()">
+          <span class="acc-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M10 11v6M14 11v6" /></svg>
+          </span>
+          <span class="acc-label">Xóa bộ nhớ đệm</span>
+          <span class="acc-note" id="acc-cache-size">(42 MB)</span>
+          <svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6" /></svg>
+        </button>
+      </div>
+
+      <!-- SECTION 3 -->
+      <p class="acc-section-title">Hỗ trợ &amp; Thông tin</p>
+      <div class="acc-card">
+        <button type="button" class="acc-row" onclick="accRowInfo('Trung tâm trợ giúp')">
+          <span class="acc-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></svg>
+          </span>
+          <span class="acc-label">Trung tâm trợ giúp</span>
+          <svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6" /></svg>
+        </button>
+
+        <button type="button" class="acc-row" onclick="accRowInfo('Điều khoản &amp; Quyền riêng tư')">
+          <span class="acc-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8M16 17H8" /></svg>
+          </span>
+          <span class="acc-label">Điều khoản &amp; Quyền riêng tư</span>
+          <svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6" /></svg>
+        </button>
+      </div>
+
+      <!-- LOGOUT -->
+      <button type="button" class="acc-logout" onclick="confirmLogout()">Đăng xuất</button>
+
+      <!-- DELETE ACCOUNT -->
+      <button type="button" class="acc-delete" onclick="confirmDeleteAccount()">Xóa tài khoản</button>
+
+      <!-- VERSION -->
+      <p class="acc-version">Phiên bản 0.01</p>
+
+    </section>
+
   </main>
 
   <!-- MOBILE BOTTOM NAVIGATION BAR (Thumb Friendly) -->
@@ -1571,6 +2056,56 @@
       <span>Kho Hàng</span>
     </button>
   </nav>
+
+  <!-- MODAL: EDIT PROFILE (Bottom Sheet) -->
+  <div id="profile-modal" class="sheet-overlay" data-sheet="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title" aria-hidden="true" onclick="if(event.target===this)closeProfileModal()">
+    <div class="sheet" id="profile-modal-content">
+      <div class="sheet-grabber" aria-hidden="true"></div>
+
+      <div class="sheet-head">
+        <h3 id="profile-modal-title" class="text-base font-bold text-slate-900">Chỉnh sửa hồ sơ</h3>
+        <button type="button" onclick="closeProfileModal()" class="p-2.5 -mr-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 shrink-0" aria-label="Đóng">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="sheet-body">
+        <form id="profile-form" onsubmit="handleProfileSubmit(event)" class="space-y-3.5" novalidate>
+          <div>
+            <label class="field-label" for="profile-name">Họ và tên</label>
+            <input type="text" id="profile-name" name="profile-name" class="field" maxlength="60" autocomplete="name" required>
+            <p class="err-msg hidden" id="profile-name-err">Vui lòng nhập họ và tên</p>
+          </div>
+          <div>
+            <label class="field-label" for="profile-email">Email</label>
+            <input type="email" id="profile-email" name="profile-email" class="field" maxlength="120" autocomplete="email" required>
+            <p class="err-msg hidden" id="profile-email-err">Email không hợp lệ</p>
+          </div>
+        </form>
+      </div>
+
+      <div class="sheet-foot">
+        <button type="button" onclick="closeProfileModal()" class="btn btn-quiet">Hủy</button>
+        <button type="submit" form="profile-form" class="btn btn-primary flex-1">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM DIALOG (Account / Settings) -->
+  <div id="acc-alert-overlay" class="acc-alert-overlay" role="dialog" aria-modal="true" aria-labelledby="acc-alert-title" aria-describedby="acc-alert-msg" aria-hidden="true" onclick="if(event.target===this)closeAlert()">
+    <div class="acc-alert" id="acc-alert">
+      <div class="acc-alert-body">
+        <p class="acc-alert-title" id="acc-alert-title">Tiêu đề</p>
+        <p class="acc-alert-msg" id="acc-alert-msg">Nội dung</p>
+      </div>
+      <div class="acc-alert-actions" id="acc-alert-actions">
+        <button type="button" class="acc-alert-btn is-muted" id="acc-alert-cancel" onclick="closeAlert()">Hủy</button>
+        <button type="button" class="acc-alert-btn" id="acc-alert-confirm" onclick="runAlertConfirm()">Xác nhận</button>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL: HIVE DETAIL (Bottom Sheet) -->
   <div id="hive-modal" class="sheet-overlay" data-sheet="hive-modal" role="dialog" aria-modal="true" aria-labelledby="modal-hive-id" aria-hidden="true" onclick="if(event.target===this)closeHiveModal()">
@@ -1823,11 +2358,14 @@
       ]
     };
 
+    const PAGE_KEYS = ['dashboard', 'hives', 'finance', 'inventory', 'account'];
+
     const PAGE_TITLES = {
       dashboard: 'Trang Chủ',
       hives: 'Đàn Ong',
       finance: 'Tài Chính',
-      inventory: 'Kho Hàng'
+      inventory: 'Kho Hàng',
+      account: 'Tài khoản'
     };
 
     const incomeCategories = ['Bán Mật Ong', 'Bán Phấn Hoa & Sữa Ong', 'Bán Đàn Ong Giống', 'Du Lịch Trải Nghiệm Trại'];
@@ -2015,7 +2553,12 @@
     function switchPage(pageKey) {
       state.currentPage = pageKey;
 
-      ['dashboard', 'hives', 'finance', 'inventory'].forEach(key => {
+      // Trang Tài khoản: đổi nền trang + đóng lớp phủ đang mở
+      document.body.classList.toggle('acc-mode', pageKey === 'account');
+      closeAlert();
+      if (isSheetOpen('profile-modal')) closeProfileModal();
+
+      PAGE_KEYS.forEach(key => {
         const sec = document.getElementById(`page-${key}`);
         if (sec) sec.classList.toggle('hidden', key !== pageKey);
       });
@@ -2028,7 +2571,7 @@
       }
 
       // Thanh pill điều hướng desktop
-      ['dashboard', 'hives', 'finance', 'inventory'].forEach(key => {
+      PAGE_KEYS.forEach(key => {
         const pill = document.getElementById(`nav-pill-${key}`);
         if (!pill) return;
         pill.className = key === pageKey
@@ -2037,7 +2580,7 @@
       });
 
       // Thanh điều hướng dưới (mobile)
-      ['dashboard', 'hives', 'finance', 'inventory'].forEach(key => {
+      PAGE_KEYS.forEach(key => {
         const btn = document.getElementById(`mobile-nav-${key}`);
         if (!btn) return;
         btn.classList.toggle('is-active', key === pageKey);
@@ -2070,6 +2613,8 @@
         setTimeout(() => initFinanceChart(document.querySelector('.fin-filter-btn.is-active')?.dataset.range || '6m'), 50);
       } else if (pageKey === 'inventory') {
         renderInventory();
+      } else if (pageKey === 'account') {
+        closeProfileModal();
       }
 
       closeNotifDropdown();
@@ -2079,6 +2624,195 @@
     function navigateAndClose(pageKey) {
       switchPage(pageKey);
       closeSidebar();
+    }
+
+    /* =========================================================================
+       TÀI KHOẢN & CÀI ĐẶT (Account / Settings)
+       ========================================================================= */
+    let cacheMB = 42;
+    let activeAlert = null;
+    let alertReturnFocus = null;
+
+    /* --- Row có chevron: phản hồi ngắn ------------------------------------ */
+    function accRowInfo(label) {
+      showToast(`${label} — sắp ra mắt`, 'info');
+    }
+
+    /* --- Toggle Face ID/Vân tay ------------------------------------------- */
+    function toggleBiometric() {
+      const sw = document.getElementById('acc-switch-biometric');
+      if (!sw) return;
+      const on = sw.getAttribute('aria-checked') !== 'true';
+      sw.setAttribute('aria-checked', on ? 'true' : 'false');
+      showToast(on ? 'Đã bật đăng nhập Face ID/Vân tay' : 'Đã tắt đăng nhập Face ID/Vân tay', on ? 'success' : 'info');
+    }
+
+    /* --- Giao diện tối: chưa triển khai ------------------------------------ */
+    function attemptDarkMode() {
+      const sw = document.getElementById('acc-switch-dark');
+      if (sw) sw.setAttribute('aria-checked', 'false');
+      showToast('Chế độ tối sẽ ra mắt ở bản cập nhật sau', 'info');
+    }
+
+    /* --- Xác nhận (iOS-style centered alert) ------------------------------ */
+    function isAlertOpen() { return !!activeAlert; }
+
+    function openAlert(cfg) {
+      const overlay = document.getElementById('acc-alert-overlay');
+      if (!overlay) return;
+      activeAlert = cfg;
+      alertReturnFocus = document.activeElement;
+
+      setText('acc-alert-title', cfg.title);
+      const msg = document.getElementById('acc-alert-msg');
+      if (msg) msg.innerHTML = cfg.message || '';
+
+      const actions = document.getElementById('acc-alert-actions');
+      if (actions) actions.classList.toggle('is-stacked', !!cfg.stacked);
+
+      const cancel = document.getElementById('acc-alert-cancel');
+      const confirm = document.getElementById('acc-alert-confirm');
+      if (cancel) cancel.textContent = cfg.cancelLabel || 'Hủy';
+      if (confirm) {
+        confirm.textContent = cfg.confirmLabel || 'Xác nhận';
+        confirm.className = 'acc-alert-btn' + (cfg.danger ? ' is-danger' : '');
+      }
+
+      overlay.classList.add('is-open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('acc-alert-open');
+      if (cancel) { try { cancel.focus(); } catch (e) {} }
+    }
+
+    function closeAlert() {
+      const overlay = document.getElementById('acc-alert-overlay');
+      activeAlert = null;
+      if (overlay) {
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+      document.body.classList.remove('acc-alert-open');
+      if (alertReturnFocus && typeof alertReturnFocus.focus === 'function') {
+        try { alertReturnFocus.focus(); } catch (e) {}
+      }
+      alertReturnFocus = null;
+    }
+
+    function runAlertConfirm() {
+      const cfg = activeAlert;
+      if (cfg && typeof cfg.onConfirm === 'function') cfg.onConfirm();
+      else closeAlert();
+    }
+
+    /* --- 3 dialog xác nhận ------------------------------------------------- */
+    function confirmLogout() {
+      openAlert({
+        title: 'Đăng xuất',
+        message: 'Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này?',
+        cancelLabel: 'Hủy',
+        confirmLabel: 'Đăng xuất',
+        danger: true,
+        onConfirm: function () {
+          closeAlert();
+          showToast('Bạn đã đăng xuất (bản demo)', 'info');
+        }
+      });
+    }
+
+    function confirmDeleteAccount() {
+      openAlert({
+        title: 'Xóa tài khoản',
+        message: 'Hành động này là <strong>vĩnh viễn</strong>. Toàn bộ dữ liệu, lịch sử giao dịch và cài đặt của bạn sẽ bị xóa vĩnh viễn và không thể khôi phục.',
+        cancelLabel: 'Hủy',
+        confirmLabel: 'Xóa vĩnh viễn',
+        danger: true,
+        stacked: true,
+        onConfirm: function () {
+          closeAlert();
+          showToast('Bản demo — tài khoản chưa bị xóa', 'warning');
+        }
+      });
+    }
+
+    function confirmClearCache() {
+      if (cacheMB <= 0) {
+        showToast('Bộ nhớ đệm đã được dọn sạch', 'info');
+        return;
+      }
+      openAlert({
+        title: 'Xóa bộ nhớ đệm',
+        message: `<strong>${cacheMB} MB</strong> tệp tạm thời sẽ bị xóa. Ứng dụng vẫn hoạt động bình thường.`,
+        cancelLabel: 'Hủy',
+        confirmLabel: 'Xác nhận',
+        onConfirm: runClearCache
+      });
+    }
+
+    function runClearCache() {
+      closeAlert();
+      const prev = cacheMB;
+      const el = document.getElementById('acc-cache-size');
+      if (el) el.textContent = 'Đang xóa…';
+      setTimeout(function () {
+        cacheMB = 0;
+        if (el) el.textContent = '(0 MB)';
+        showToast(`Đã giải phóng ${prev} MB bộ nhớ đệm`, 'success');
+      }, 600);
+    }
+
+    /* --- Sheet sửa hồ sơ (tái dùng hệ thống .sheet có sẵn) ---------------- */
+    function openProfileModal() {
+      const name = document.getElementById('profile-name');
+      const email = document.getElementById('profile-email');
+      if (name) name.value = document.getElementById('acc-name')?.textContent.trim() || '';
+      if (email) email.value = document.getElementById('acc-email')?.textContent.trim() || '';
+      clearFieldError('profile-name', 'profile-name-err');
+      clearFieldError('profile-email', 'profile-email-err');
+      openSheet('profile-modal');
+      if (name) setTimeout(() => { try { name.focus(); } catch (e) {} }, 60);
+    }
+
+    function closeProfileModal() { closeSheet('profile-modal'); }
+
+    function handleProfileSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('profile-name');
+      const email = document.getElementById('profile-email');
+      const nameVal = (name?.value || '').trim();
+      const emailVal = (email?.value || '').trim();
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailVal);
+
+      if (!nameVal) {
+        showFieldError('profile-name', 'profile-name-err');
+        try { name.focus(); } catch (err) {}
+        return;
+      }
+      if (!emailOk) {
+        showFieldError('profile-email', 'profile-email-err');
+        try { email.focus(); } catch (err) {}
+        return;
+      }
+      clearFieldError('profile-name', 'profile-name-err');
+      clearFieldError('profile-email', 'profile-email-err');
+
+      setText('acc-name', nameVal);
+      setText('acc-email', emailVal);
+      closeProfileModal();
+      showToast('Đã cập nhật hồ sơ', 'success');
+    }
+
+    function showFieldError(fieldId, errId) {
+      const f = document.getElementById(fieldId);
+      const err = document.getElementById(errId);
+      if (f) f.classList.add('border-rose-400');
+      if (err) err.classList.remove('hidden');
+    }
+
+    function clearFieldError(fieldId, errId) {
+      const f = document.getElementById(fieldId);
+      const err = document.getElementById(errId);
+      if (f) f.classList.remove('border-rose-400');
+      if (err) err.classList.add('hidden');
     }
 
     /* =========================================================================
@@ -2141,6 +2875,7 @@
     // Phím Esc đóng lớp trên cùng
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
+      if (isAlertOpen()) { closeAlert(); return; }
       if (openSheetIds.length) { closeSheet(openSheetIds[openSheetIds.length - 1]); return; }
       if (isSidebarOpen()) { closeSidebar(); return; }
       closeNotifDropdown();
