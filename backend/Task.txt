@@ -1,0 +1,196 @@
+VietBee Backend
+├── Database & API
+│   ├── Khởi tạo bảng / Database
+│   ├── REST API / CRUD
+│   └── Validation & Error Handling
+│
+├── User & Authentication
+│   ├── Đăng ký / Đăng nhập
+│   ├── JWT / Phân quyền
+│   └── Cập nhật thông tin người dùng
+│
+├── Farm & Hive Management
+│   ├── Quản lý trang trại
+│   ├── Quản lý thùng ong
+│   ├── QR Code thùng ong
+│   └── Lịch sử chăm sóc / thu hoạch
+│
+├── IoT & Device
+│   ├── QR Code thiết bị
+│   ├── Kết nối Device ↔ Hive
+│   ├── Quản lý thiết bị
+│   └── Nhận dữ liệu Sensor
+│
+├── Camera & AI
+│   ├── Nhận / lưu hình ảnh
+│   ├── AI nhận diện hình ảnh
+│   ├── Dự đoán tình trạng thùng ong
+│   └── Dự đoán sản lượng mật
+│
+├── Alert & Notification
+│   ├── Cảnh báo Sensor
+│   ├── Cảnh báo AI
+│   └── Thông báo người dùng
+│
+├── Admin
+│   ├── Quản lý User
+│   ├── Quản lý Farm / Hive / Device
+│   └── System Logs
+│
+└── Deployment
+    ├── Production Domain
+    ├── Test / Staging Domain
+    ├── Admin Subdomain
+    ├── API Subdomain
+    ├── Docker
+    └── HTTPS
+    
+    
+    
+    VietBee Backend – Task List
+
+[ ] 1. Khởi tạo Backend
+    [ ] Tạo project backend
+    [ ] Cấu hình environment (.env)
+    [ ] Kết nối database
+    [ ] Cấu hình REST API
+    [ ] Thiết lập cấu trúc thư mục
+    [ ] Thiết lập Git / GitHub
+
+[ ] 2. Database
+    [ ] Thiết kế ERD
+    [ ] Tạo bảng Users
+    [ ] Tạo bảng Farms
+    [ ] Tạo bảng Hives
+    [ ] Tạo bảng Devices
+    [ ] Tạo bảng Sensors
+    [ ] Tạo bảng Sensor Readings
+    [ ] Tạo bảng Images
+    [ ] Tạo bảng Alerts
+    [ ] Tạo bảng AI Predictions
+    [ ] Tạo bảng Harvests
+    [ ] Tạo bảng Activity Logs
+    [ ] Tạo Migration / Seed Data
+
+[ ] 3. Authentication & User
+    [ ] Register
+    [ ] Login
+    [ ] Logout
+    [ ] JWT / Refresh Token
+    [ ] Role & Permission
+    [ ] Xem thông tin User
+    [ ] Cập nhật thông tin User
+    [ ] Đổi mật khẩu
+
+[ ] 4. Farm Management
+    [ ] Tạo Farm
+    [ ] Sửa Farm
+    [ ] Xóa Farm
+    [ ] Xem danh sách Farm
+    [ ] Quản lý khu vực trong Farm
+
+[ ] 5. Hive Management
+    [ ] Tạo thùng ong
+    [ ] Sửa thông tin thùng
+    [ ] Xóa thùng
+    [ ] Xem danh sách thùng
+    [ ] Xem chi tiết thùng
+    [ ] Tạo QR Code cho thùng
+    [ ] Quét QR → mở Hive Detail
+    [ ] Lưu lịch sử chăm sóc
+    [ ] Lưu lịch sử thu hoạch
+
+[ ] 6. Device / IoT
+    [ ] Đăng ký thiết bị
+    [ ] Tạo QR Code thiết bị
+    [ ] Quét QR thiết bị
+    [ ] Kết nối Device → Hive
+    [ ] Hủy kết nối Device
+    [ ] Kiểm tra trạng thái Device
+    [ ] Kiểm tra Last Online
+    [ ] Theo dõi Battery
+
+[ ] 7. Sensor
+    [ ] API nhận dữ liệu Sensor
+    [ ] Validate dữ liệu
+    [ ] Lưu dữ liệu Sensor
+    [ ] Lấy dữ liệu theo Hive
+    [ ] Lấy dữ liệu theo thời gian
+    [ ] API dữ liệu realtime
+    [ ] API dữ liệu biểu đồ
+
+[ ] 8. Camera / Image
+    [ ] API upload hình ảnh
+    [ ] Lưu hình ảnh
+    [ ] Liên kết Image → Hive
+    [ ] Xem lịch sử hình ảnh
+    [ ] Xóa hình ảnh
+
+[ ] 9. AI
+    [ ] API nhận Image → AI
+    [ ] AI Detection
+    [ ] AI Health Prediction
+    [ ] AI Honey Prediction
+    [ ] Lưu kết quả Prediction
+    [ ] API lấy kết quả AI
+    [ ] API Recommendation
+
+[ ] 10. Alert / Notification
+    [ ] Tạo Alert
+    [ ] Alert từ Sensor
+    [ ] Alert từ AI
+    [ ] Đánh dấu Alert đã đọc
+    [ ] Notification cho User
+    [ ] Lưu lịch sử Alert
+
+[ ] 11. Admin
+    [ ] Admin Login
+    [ ] Quản lý User
+    [ ] Quản lý Farm
+    [ ] Quản lý Hive
+    [ ] Quản lý Device
+    [ ] Xem System Logs
+    [ ] Theo dõi trạng thái hệ thống
+
+[ ] 12. API Documentation
+    [ ] Swagger / OpenAPI
+    [ ] Document Authentication API
+    [ ] Document Hive API
+    [ ] Document Device API
+    [ ] Document Sensor API
+    [ ] Document AI API
+    [ ] Document Admin API
+
+[ ] 13. Security
+    [ ] Password Hashing
+    [ ] JWT Security
+    [ ] API Authorization
+    [ ] Input Validation
+    [ ] Rate Limiting
+    [ ] CORS
+    [ ] HTTPS
+    [ ] API Error Handling
+
+[ ] 14. Testing
+    [ ] Test Authentication
+    [ ] Test Hive API
+    [ ] Test QR
+    [ ] Test Device
+    [ ] Test Sensor
+    [ ] Test Image Upload
+    [ ] Test AI API
+    [ ] Test Admin
+    [ ] Integration Test
+
+[ ] 15. Deployment
+    [ ] Docker
+    [ ] Production Environment
+    [ ] Test / Staging Environment
+    [ ] Production Database
+    [ ] Test Database
+    [ ] API Domain
+    [ ] Admin Subdomain
+    [ ] Test Subdomain
+    [ ] SSL / HTTPS
+    [ ] Backup Database
+    [ ] Monitoring / Logs
