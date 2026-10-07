@@ -783,11 +783,11 @@
           </button>
 
           <!-- Current page title (mobile / tablet only) -->
-          <span id="header-page-title" class="md:hidden text-[13px] font-semibold text-slate-500 truncate min-w-0 hidden">Trang Chủ</span>
+          <span id="header-page-title" class="lg:hidden text-[13px] font-semibold text-slate-500 truncate min-w-0 hidden">Trang Chủ</span>
         </div>
 
-        <!-- Center: Quick Nav Pills (Desktop Only) -->
-        <nav class="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200">
+        <!-- Center: Quick Nav Pills (Large desktop only) -->
+        <nav class="hidden lg:flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200">
           <button onclick="switchPage('dashboard')" id="nav-pill-dashboard" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-brand shadow-sm">
             Trang Chủ
           </button>
@@ -799,6 +799,9 @@
           </button>
           <button onclick="switchPage('inventory')" id="nav-pill-inventory" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-brand">
             Kho Hàng
+          </button>
+          <button onclick="switchPage('account')" id="nav-pill-account" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-brand">
+            Tài khoản
           </button>
         </nav>
 
@@ -924,6 +927,12 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
             <span>Quản Lý Kho Hàng</span>
+          </button>
+          <button onclick="navigateAndClose('account')" class="sidebar-link w-full flex items-center gap-3 px-3 min-h-[44px] py-2.5 text-xs font-medium rounded-lg transition-colors text-slate-600 hover:text-brand hover:bg-slate-50" data-page="account">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span>Tài khoản</span>
           </button>
         </nav>
       </div>
@@ -1901,8 +1910,8 @@
     <!-- ========================================================================= -->
     <section id="page-account" class="hidden acc-page">
 
-      <!-- Page header: app header only shows the title below md -->
-      <h1 class="acc-h1 hidden md:block">Tài khoản</h1>
+      <!-- Page header: only where the app header hides the title (lg+) -->
+      <h1 class="acc-h1 hidden lg:block">Tài khoản</h1>
 
       <!-- Profile card -->
       <div class="acc-profile">
@@ -2054,6 +2063,13 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
       </svg>
       <span>Kho Hàng</span>
+    </button>
+
+    <button type="button" onclick="switchPage('account')" id="mobile-nav-account" data-page="account" class="bottom-nav-btn">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+      </svg>
+      <span>Tài khoản</span>
     </button>
   </nav>
 
