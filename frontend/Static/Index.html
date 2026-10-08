@@ -12,6 +12,7 @@
   --bg:#EEF0EA; --bg2:#E1E5DC; --card:#FFFFFF; --soft:#F4F6F1; --ink:#1E231F; --muted:#626C64; --line:#DADFD5;
   --brand:#E58A1F; --brand-ink:#2B1A04;
   --ok:#23834F; --on-ok:#FFFFFF; --warn:#E8B900; --on-warn:#2A2000; --bad:#C93A3A; --on-bad:#FFFFFF;
+  --nav-active:#16A34A; --nav-bg:rgba(255,255,255,.88);
   --c-blue:#4F7CA3; --c-brown:#8A6A3B;
   --r1:#4A3822; --r2:#8A6A3B; --r3:#B88A3E; --r4:#E3C27E; --r5:#8C9788; --r6:#C7CEC2;
   --font:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
@@ -23,6 +24,7 @@
   :root:not([data-theme="light"]){
     --bg:#141713; --bg2:#0D0F0C; --card:#1D211C; --soft:#252A23; --ink:#ECEFE8; --muted:#A0A99B; --line:#2F352C;
     --ok:#3FBF78; --on-ok:#05200F; --warn:#F0C419; --on-warn:#231A00; --bad:#EF6161; --on-bad:#2B0505;
+    --nav-active:#3FBF78; --nav-bg:rgba(29,33,28,.88);
     --c-blue:#7FA7CC; --c-brown:#C49A55;
     --r1:#E6D3AE; --r2:#C49A55; --r3:#9C7434; --r4:#6F5326; --r5:#8F9B8A; --r6:#50584D;
   }
@@ -30,6 +32,7 @@
 :root[data-theme="dark"]{
   --bg:#141713; --bg2:#0D0F0C; --card:#1D211C; --soft:#252A23; --ink:#ECEFE8; --muted:#A0A99B; --line:#2F352C;
   --ok:#3FBF78; --on-ok:#05200F; --warn:#F0C419; --on-warn:#231A00; --bad:#EF6161; --on-bad:#2B0505;
+  --nav-active:#3FBF78; --nav-bg:rgba(29,33,28,.88);
   --c-blue:#7FA7CC; --c-brown:#C49A55;
   --r1:#E6D3AE; --r2:#C49A55; --r3:#9C7434; --r4:#6F5326; --r5:#8F9B8A; --r6:#50584D;
 }
@@ -52,7 +55,7 @@ button{font:inherit;color:inherit}
 .top :focus-visible{outline-color:var(--brand-ink)}
 .ic{flex:none}
 
-main{padding:16px 14px 48px}
+main{padding:16px 14px 104px}
 h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
 .sub{color:var(--muted);font-size:13px;margin-top:2px}
 .pagehead{margin-bottom:12px}
@@ -202,15 +205,16 @@ select{appearance:auto}
 /* Overlays */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
 .scrim.on{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;bottom:0;left:0;width:min(300px,84vw);background:var(--card);z-index:50;transform:translateX(-104%);transition:transform .22s ease;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;visibility:hidden}
-.drawer.on{transform:none;visibility:visible}
-.drawer .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.drawer .logo{position:static;transform:none;color:var(--ink)}
-.nav{display:grid;gap:4px}
-.nav button{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 12px;border:0;background:none;border-radius:12px;font-weight:600;font-size:15px;cursor:pointer;text-align:left;width:100%}
-.nav button[aria-current="page"]{background:var(--brand);color:var(--brand-ink)}
-.nav .cnt{margin-left:auto;font-size:12px;font-weight:700}
-.dfoot{margin-top:auto;font-size:12px;color:var(--muted);padding:10px 12px}
+/* Bottom navigation */
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:35;background:var(--nav-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.bnav ul{list-style:none;margin:0 auto;padding:0;max-width:480px;display:grid;grid-template-columns:repeat(5,1fr)}
+.bnav li{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.bnav-item{position:relative;width:100%;min-height:48px;min-width:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 2px 7px;border:0;background:none;color:var(--muted);font:inherit;cursor:pointer;transition:color .15s}
+.bnav-item::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%) scaleX(0);width:26px;height:3px;border-radius:0 0 3px 3px;background:var(--nav-active);transition:transform .15s}
+.bnav-item[aria-current="page"]{color:var(--nav-active)}
+.bnav-item[aria-current="page"]::before{transform:translateX(-50%) scaleX(1)}
+.bnav-item:active{opacity:.7}
+.bnav-lb{font-size:11px;font-weight:600;letter-spacing:-.01em;line-height:1.1;white-space:nowrap}
 .sheet{position:fixed;left:50%;bottom:0;width:min(480px,100%);transform:translate(-50%,104%);background:var(--card);border-radius:20px 20px 0 0;z-index:60;padding:10px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:82vh;overflow:auto;transition:transform .22s ease;visibility:hidden;box-shadow:0 -1px 0 var(--line)}
 .sheet.on{transform:translate(-50%,0);visibility:visible}
 .grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
@@ -250,7 +254,7 @@ select{appearance:auto}
 <body>
 <div class="app">
   <header class="top">
-    <div class="grp"><button class="ibtn" data-act="menu" aria-label="Mở menu" aria-expanded="false" id="menuBtn"></button></div>
+    <div class="grp" aria-hidden="true"></div>
     <div class="logo" id="logo"></div>
     <div class="grp">
       <button class="ibtn" data-act="bell" aria-label="Thông báo" id="bellBtn"><span class="badge" id="badge"></span></button>
@@ -260,9 +264,18 @@ select{appearance:auto}
   <main id="main"></main>
 </div>
 <div class="scrim" id="scrim" data-act="close-all"></div>
-<aside class="drawer" id="drawer" aria-label="Menu chính"></aside>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Chi tiết"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<nav class="bnav" id="bnav" aria-label="Điều hướng chính">
+  <ul>
+    <li><button class="bnav-item" data-go="home" aria-label="Tổng quát"><span data-ic="home"></span><span class="bnav-lb">Tổng quát</span></button></li>
+    <li><button class="bnav-item" data-go="hives" aria-label="Quản lý trại"><span data-ic="farm"></span><span class="bnav-lb">Quản lý trại</span></button></li>
+    <li><button class="bnav-item" data-act="cam" aria-label="Mở camera"><span data-ic="cam"></span><span class="bnav-lb">Camera</span></button></li>
+    <li><button class="bnav-item" data-go="finance" aria-label="Tài chính"><span data-ic="wallet"></span><span class="bnav-lb">Tài chính</span></button></li>
+    <li><button class="bnav-item" data-go="inventory" aria-label="Kho hàng"><span data-ic="box"></span><span class="bnav-lb">Kho hàng</span></button></li>
+  </ul>
+</nav>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -316,7 +329,9 @@ const ICONS={
  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
  db:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
  out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
- chev:'<path d="M9 18l6-6-6-6"/>'
+ chev:'<path d="M9 18l6-6-6-6"/>',
+ farm:'<path d="M3 21V11.2L12 4l9 7.2V21"/><path d="M2.2 21h19.6"/><path d="M12 21v-5.4"/><path d="M12 15.6c0-2.4 1.9-4.3 4.3-4.3 0 2.4-1.9 4.3-4.3 4.3z"/><path d="M12 15.6c0-2.4-1.9-4.3-4.3-4.3 0 2.4 1.9 4.3 4.3 4.3z"/>',
+ cam:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>'
 };
 const ic=(n,s=20)=>'<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICONS[n]+'</svg>';
 const ST={ok:'Khỏe mạnh',warn:'Cần theo dõi',bad:'Có vấn đề'};
@@ -538,7 +553,9 @@ function hexBtn(h,dim){
   return `<button class="hex ${h.status}${dim?' dim':''}" data-act="hive-open" data-id="${h.n}" aria-label="${h.id}, khu ${h.zone}, ${h.t} độ C, ${ST[h.status]}" title="${h.id} · ${h.t}°C · ${h.h}%">${String(h.n).padStart(3,'0')}</button>`;
 }
 function matrixHTML(){
-  return ZONES.map(z=>{
+  const zs=ZONES.filter(z=>state.hq.zone==='all'||z===state.hq.zone);
+  if(!HIVES.filter(hiveMatch).length)return '<div class="empty">Không có thùng nào khớp bộ lọc.</div>';
+  return zs.map(z=>{
     const hs=HIVES.filter(h=>h.zone===z), prob=hs.filter(h=>h.status!=='ok').length;
     let rows='';
     for(let i=0;i<hs.length;i+=6){rows+=`<div class="hexrow${(i/6)%2?' odd':''}">${hs.slice(i,i+6).map(h=>hexBtn(h,!hiveMatch(h))).join('')}</div>`}
@@ -954,17 +971,15 @@ function exportCSV(){
 }
 
 /* ================= Overlays ================= */
-const NAV=[['home','Trang chủ','home'],['hives','Quản lý đàn ong','hex'],['finance','Tài chính','wallet'],['inventory','Kho hàng','box']];
-function drawerHTML(){
-  const c=counts();
-  return `<div class="dh"><div class="logo">${logoMark()}VietBee</div><button class="ibtn" data-act="close-all" aria-label="Đóng menu">${ic('close')}</button></div>
-  <nav class="nav" aria-label="Điều hướng">${NAV.map(n=>`<button data-go="${n[0]}"${(state.route.name===n[0]||(n[0]==='hives'&&state.route.name==='hive'))?' aria-current="page"':''}>${ic(n[2])}${n[1]}${n[0]==='hives'&&c.bad?`<span class="cnt">${c.bad} cảnh báo</span>`:''}</button>`).join('')}</nav>
-  <div class="dfoot">Trang trại ong Long Khánh<br>${HIVES.length} thùng · 4 khu vực</div>`;
-}
 const logoMark=()=>'<svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8l9.2 5.1v10.2L12 22.2l-9.2-5.1V6.9z" fill="currentColor"/><path d="M12 7l4.6 2.6v5.2L12 17.4l-4.6-2.6V9.6z" fill="var(--brand)"/></svg>';
 function openSheet(html){const s=$('#sheet');s.innerHTML='<div class="grab"></div>'+html;s.classList.add('on');$('#scrim').classList.add('on');s.scrollTop=0}
-function closeAll(){$('#sheet').classList.remove('on');$('#drawer').classList.remove('on');$('#scrim').classList.remove('on');$('#menuBtn').setAttribute('aria-expanded','false')}
-function openDrawer(){const d=$('#drawer');d.innerHTML=drawerHTML();d.classList.add('on');$('#scrim').classList.add('on');$('#menuBtn').setAttribute('aria-expanded','true');const b=$('.nav button',d);if(b)b.focus()}
+function closeAll(){$('#sheet').classList.remove('on');$('#scrim').classList.remove('on')}
+function camSheet(){
+  openSheet(`<h3>Máy ảnh</h3>
+  <div class="hint" style="margin-top:6px">Quét mã QR định danh hoặc chụp ảnh tình trạng thùng.</div>
+  <button class="btn" data-act="cam-qr">${ic('hex',16)} Quét mã QR thùng ong</button>
+  <button class="btn ghost" data-act="cam-shot">${ic('cam',16)} Chụp ảnh thùng</button>`);
+}
 function hiveSheet(n){
   const h=HIVES[n-1];if(!h)return;
   openSheet(`<div class="hd"><h3>${h.id}</h3>${st(h.status)}</div>
@@ -1001,6 +1016,8 @@ function render(){
   $('#badge').textContent=bellCount()||'';
   const titles={home:'Trang chủ',hives:'Quản lý đàn ong',hive:'Chi tiết thùng',finance:'Tài chính',inventory:'Kho hàng',account:'Tài khoản'};
   document.title='VietBee – '+titles[r.name];
+  const navKey=r.name==='hive'?'hives':r.name;
+  $$('#bnav .bnav-item').forEach(b=>{if(b.dataset.go===navKey)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
 }
 function go(spec){
   const p=spec.split(':');
@@ -1014,7 +1031,9 @@ document.addEventListener('click',function(e){
   if(t.dataset.go){go(t.dataset.go);return}
   const a=t.dataset.act,v=t.dataset.v;
   switch(a){
-    case 'menu':openDrawer();break;
+    case 'cam':camSheet();break;
+    case 'cam-qr':closeAll();toast('Bản demo — chưa bật camera thật');break;
+    case 'cam-shot':closeAll();toast('Bản demo — chưa bật camera thật');break;
     case 'bell':bellSheet();break;
     case 'user':
       if(state.route.name!=='account')state.from=state.route;
@@ -1150,10 +1169,10 @@ function saveStock(){
 }
 
 /* ================= Init ================= */
-$('#menuBtn').insertAdjacentHTML('afterbegin',ic('menu',24));
 $('#bellBtn').insertAdjacentHTML('afterbegin',ic('bell',22));
 $('#userBtn').insertAdjacentHTML('afterbegin',ic('user',22));
 $('#logo').innerHTML=logoMark()+'VietBee';
+$$('#bnav [data-ic]').forEach(el=>{el.innerHTML=ic(el.dataset.ic,24)});
 if(window.matchMedia){const mq=matchMedia('(prefers-color-scheme: dark)');const h=()=>{if(state.theme==='auto')render()};if(mq.addEventListener)mq.addEventListener('change',h)}
 render();
 })();
