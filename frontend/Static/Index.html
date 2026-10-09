@@ -445,10 +445,10 @@ const INV_LOG=[
 const state={
   route:{name:'home'},
   from:null,
-  hq:{q:'',status:'all',zone:'all',breed:'all',age:'all',sort:'id',view:'matrix',allIssues:false},
+  hq:{q:'',status:'all',zone:'all',breed:'all',age:'all',sort:'id',view:'matrix'},
   range:'24h',
-  fin:{type:'in',more:false},
-  inv:{q:'',cat:'all',st:'all',sk:'code',dir:1,shown:10,tab:'in',hf:'all',hmore:false,pre:''},
+  fin:{type:'in'},
+  inv:{q:'',cat:'all',st:'all',sk:'code',dir:1,shown:10,tab:'in',hf:'all',pre:''},
   theme:'auto',
   acct:{name:'Nguyễn Văn An',role:'Chủ trại',phone:'0901234456',email:'an.vietbee@gmail.com',farm:'Trang trại ong Long Khánh',twofa:true,
     noti:{hive:true,stock:true,report:false,quiet:false},
@@ -582,11 +582,10 @@ function updateHiveView(){
   $$('[data-act="chip-status"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===state.hq.status)));
   const so=$('[data-f="sort"]');if(so)so.value=state.hq.sort;
 }
-function issuesHTML(){
-  const a=issueHives(), shown=state.hq.allIssues?a:a.slice(0,3);
+function issuesHTML(limit){
+  const a=issueHives(), shown=a.slice(0,limit||4);
   return `<table class="tbl"><thead><tr><th>Thùng</th><th>Vấn đề</th><th>Mức độ</th><th class="r">Thời gian</th></tr></thead><tbody>
-  ${shown.map(h=>`<tr class="clk" data-act="hive-open" data-id="${h.n}"><td class="code">${h.id}</td><td>${esc(h.issue)}</td><td>${st(h.status,h.status==='bad'?'Cao':'Trung bình')}</td><td class="num">${ago(h.mins)}</td></tr>`).join('')}</tbody></table>
-  ${a.length>3?`<button class="linkbtn" data-act="issues-all">${state.hq.allIssues?'Thu gọn':'Xem tất cả ('+a.length+')'}</button>`:''}`;
+  ${shown.map(h=>`<tr class="clk" data-act="hive-open" data-id="${h.n}"><td class="code">${h.id}</td><td>${esc(h.issue)}</td><td>${st(h.status,h.status==='bad'?'Cao':'Trung bình')}</td><td class="num">${ago(h.mins)}</td></tr>`).join('')}</tbody></table>`;
 }
 function pageHives(){
   const c=counts(), f=state.hq;
@@ -621,7 +620,7 @@ function pageHives(){
     <div id="hiveView"></div>
     <div class="legend">${st('ok','Bình thường')}${st('warn','Cần theo dõi')}${st('bad','Có vấn đề')}</div>
   </section>
-  <section class="card"><div class="hd"><h2>Các thùng có vấn đề</h2></div><div id="issues">${issuesHTML()}</div></section>
+  <section class="card"><div class="hd"><h2>Các thùng có vấn đề</h2><button class="ibtn" data-act="issues-open" aria-label="Xem toàn bộ thùng có vấn đề">${ic('menu',22)}</button></div><div id="issues">${issuesHTML()}</div></section>
   <section class="card"><h2>Thống kê nhanh</h2>
     <div class="tiles">
       <div class="tile"><div class="v">${stages.new}</div><div class="l">Đàn mới</div></div>
@@ -650,8 +649,9 @@ function detSVG(d,hive){
   <text x="10" y="190" font-size="10" fill="#e8d9b8" font-family="monospace">CAM-${String(hive.n).padStart(3,'0')} · ${hhmm(ts)} ${ddmm(ts)}</text>
   <circle cx="284" cy="186" r="4" fill="#ff5a4d"/></svg>`;
 }
-function histHTML(h){
-  return `<ul class="log">${h.hist.slice(0,12).map(e=>`<li><span class="d">${ddmm(e.ts)}<br>${hhmm(e.ts)}</span><span>${esc(e.type)}<span class="s">${esc(e.note)}</span></span><span class="m hint">${esc(e.who)}</span></li>`).join('')}</ul>`;
+function histHTML(h,limit){
+  const n=limit||4;
+  return `<ul class="log">${h.hist.slice(0,n).map(e=>`<li><span class="d">${ddmm(e.ts)}<br>${hhmm(e.ts)}</span><span>${esc(e.type)}<span class="s">${esc(e.note)}</span></span><span class="m hint">${esc(e.who)}</span></li>`).join('')}</ul>`;
 }
 function pageHive(n){
   const h=HIVES[n-1];if(!h)return pageHives();
@@ -683,7 +683,7 @@ function pageHive(n){
   <section class="card"><div class="hd"><h2>Nhiệt độ và độ ẩm</h2>
     <div class="seg" role="group" aria-label="Khoảng thời gian">${['24h','7d','30d'].map(r=>`<button data-act="range" data-v="${r}" aria-pressed="${state.range===r}">${r==='24h'?'24 giờ':r==='7d'?'7 ngày':'30 ngày'}</button>`).join('')}</div></div>
     <div class="cb"><canvas id="chHive"></canvas></div></section>
-  <section class="card"><h2>Lịch sử ghi nhận</h2><div id="hist">${histHTML(h)}</div></section>
+  <section class="card"><div class="hd"><h2>Lịch sử ghi nhận</h2><button class="ibtn" data-act="hist-open" aria-label="Xem toàn bộ lịch sử ghi nhận">${ic('menu',22)}</button></div><div id="hist">${histHTML(h)}</div></section>
   <section class="card"><h2>Ghi nhận mới</h2>
     <div class="fld"><label for="rType">Loại ghi nhận</label><select id="rType" data-f="rtype"><option>Kiểm tra</option><option>Cho ăn</option><option>Thu hoạch</option><option>Xử lý bệnh</option><option>Thay khung cầu</option><option>Khác</option></select></div>
     <div class="two"><div class="fld"><label for="rDate">Ngày</label><input id="rDate" type="date" value="${isoDay(Date.now())}"></div>
@@ -739,10 +739,9 @@ function finFormHTML(){
   <div class="err" id="fErr" role="alert"></div>
   <button class="btn" data-act="fin-save">${t==='in'?'Lưu khoản thu':'Lưu khoản chi'}</button>`;
 }
-function txnHTML(){
-  const all=TXNS.slice().sort((a,b)=>day(b.date)-day(a.date)), shown=state.fin.more?all:all.slice(0,5);
-  return `<ul class="log">${shown.map(t=>`<li><span class="d">${ddmm(day(t.date))}</span><span>${esc(t.desc)}<span class="s">${esc(t.cat)}</span></span><span class="a ${t.type}">${t.type==='in'?'+':'−'}${t.amt.toFixed(1)}M</span></li>`).join('')}</ul>
-  ${all.length>5?`<button class="linkbtn" data-act="fin-more">${state.fin.more?'Thu gọn':'Xem thêm ('+(all.length-5)+')'}</button>`:''}`;
+function txnHTML(limit){
+  const all=TXNS.slice().sort((a,b)=>day(b.date)-day(a.date)), shown=all.slice(0,limit||4);
+  return `<ul class="log">${shown.map(t=>`<li><span class="d">${ddmm(day(t.date))}</span><span>${esc(t.desc)}<span class="s">${esc(t.cat)}</span></span><span class="a ${t.type}">${t.type==='in'?'+':'−'}${t.amt.toFixed(1)}M</span></li>`).join('')}</ul>`;
 }
 function pageFinance(){
   const t=finTotals(), ec=DATA.expCat, etot=sumA(Object.values(ec));
@@ -758,7 +757,7 @@ function pageFinance(){
   <section class="card"><h2>Phân bổ chi phí</h2>
     <div class="donut"><div class="cv"><canvas id="chExp"></canvas></div>
     <ul class="lg">${Object.keys(ec).map(k=>`<li><span class="sw" style="background:var(${CATCOL[k]})"></span><span class="t">${k}</span><span class="n">${etot?Math.round(ec[k]/etot*100):0}%</span></li>`).join('')}</ul></div></section>
-  <section class="card"><h2>Lịch sử giao dịch</h2><div id="txns">${txnHTML()}</div></section>`;
+  <section class="card"><div class="hd"><h2>Lịch sử giao dịch</h2><button class="ibtn" data-act="txn-open" aria-label="Xem toàn bộ lịch sử giao dịch">${ic('menu',22)}</button></div><div id="txns">${txnHTML()}</div></section>`;
 }
 function setupFinance(){
   const rev=DATA.revenue,exp=DATA.expense,prof=rev.map((v,i)=>v==null?null:r1(v-(exp[i]||0)));
@@ -795,10 +794,10 @@ function invListHTML(){
   <div class="hint" style="margin-top:8px">Hiển thị ${shown.length}/${a.length} mặt hàng</div>
   ${a.length>shown.length?`<button class="linkbtn" data-act="inv-more">Xem thêm</button>`:''}`;
 }
-function invAlertsHTML(){
+function invAlertsHTML(limit){
   const o={bad:0,warn:1},a=ITEMS.filter(i=>stockSt(i)!=='ok').sort((x,y)=>o[stockSt(x)]-o[stockSt(y)]||x.qty/x.min-y.qty/y.min);
   if(!a.length)return '<div class="empty">Mọi mặt hàng đều đủ tồn kho.</div>';
-  return `<div class="rows">${a.map(i=>`<div class="rowb" style="cursor:default;grid-template-columns:auto 1fr auto"><span>${st(stockSt(i),'')}</span><span><b style="font-weight:600">${esc(i.name)}</b><br><span class="m">còn ${n0(i.qty)} ${esc(i.unit)}</span></span><button class="btn sm ghost" data-act="inv-restock" data-code="${i.code}">Nhập thêm</button></div>`).join('')}</div>`;
+  return `<div class="rows">${a.slice(0,limit||4).map(i=>`<div class="rowb" style="cursor:default;grid-template-columns:auto 1fr auto"><span>${st(stockSt(i),'')}</span><span><b style="font-weight:600">${esc(i.name)}</b><br><span class="m">còn ${n0(i.qty)} ${esc(i.unit)}</span></span><button class="btn sm ghost" data-act="inv-restock" data-code="${i.code}">Nhập thêm</button></div>`).join('')}</div>`;
 }
 function invFormHTML(){
   const f=state.inv, t=f.tab, items=ITEMS.slice().sort((a,b)=>a.name.localeCompare(b.name,'vi'));
@@ -815,11 +814,10 @@ function invFormHTML(){
   <div class="err" id="iErr" role="alert"></div>
   <button class="btn" data-act="inv-save">${t==='in'?'Lưu phiếu nhập':'Lưu phiếu xuất'}</button>`;
 }
-function invHistHTML(){
-  const f=state.inv, all=INV_LOG.filter(e=>f.hf==='all'||e.t===f.hf).sort((a,b)=>b.ts-a.ts), shown=f.hmore?all:all.slice(0,5);
+function invHistHTML(limit){
+  const f=state.inv, all=INV_LOG.filter(e=>f.hf==='all'||e.t===f.hf).sort((a,b)=>b.ts-a.ts), shown=all.slice(0,limit||4);
   if(!all.length)return '<div class="empty">Chưa có phiếu nào.</div>';
-  return `<ul class="log">${shown.map(e=>{const it=byCode(e.code);return `<li><span class="d">${ddmm(e.ts)}</span><span>${e.t==='in'?'Nhập':'Xuất'} ${n0(e.qty)} ${esc(it.unit)} ${esc(it.name.toLowerCase())}${e.note?`<span class="s">${esc(e.note)}</span>`:''}</span><span class="a">${e.t==='in'?'+':'−'}${n0(e.qty)}</span></li>`}).join('')}</ul>
-  ${all.length>5?`<button class="linkbtn" data-act="hist-more">${f.hmore?'Thu gọn':'Xem thêm ('+(all.length-5)+')'}</button>`:''}`;
+  return `<ul class="log">${shown.map(e=>{const it=byCode(e.code);return `<li><span class="d">${ddmm(e.ts)}</span><span>${e.t==='in'?'Nhập':'Xuất'} ${n0(e.qty)} ${esc(it.unit)} ${esc(it.name.toLowerCase())}${e.note?`<span class="s">${esc(e.note)}</span>`:''}</span><span class="a">${e.t==='in'?'+':'−'}${n0(e.qty)}</span></li>`}).join('')}</ul>`;
 }
 function pageInventory(){
   const t=invTotals(), f=state.inv;
@@ -842,12 +840,12 @@ function pageInventory(){
     </div>
     <div id="invList">${invListHTML()}</div>
   </section>
-  <section class="card"><div class="hd"><h2>Cảnh báo tồn kho</h2><span class="hint">${t.low} mặt hàng</span></div><div id="invAlerts">${invAlertsHTML()}</div></section>
+  <section class="card"><div class="hd"><h2>Cảnh báo tồn kho</h2><span class="hint">${t.low} mặt hàng</span><button class="ibtn" data-act="invalert-open" aria-label="Xem toàn bộ cảnh báo tồn kho">${ic('menu',22)}</button></div><div id="invAlerts">${invAlertsHTML()}</div></section>
   <section class="card"><h2>Phân loại kho</h2><div class="hint">Tỷ trọng theo giá trị tồn kho</div>
     <div class="donut"><div class="cv"><canvas id="chCat"></canvas></div>
     <ul class="lg">${catVal.map(x=>`<li><span class="sw" style="background:var(${CATCOL[x.c]})"></span><span class="t">${x.c}</span><span class="n">${Math.round(x.v/tv*100)}%</span></li>`).join('')}</ul></div></section>
   <section class="card" id="invForm" aria-label="Nhập xuất kho"><h2 style="margin-bottom:10px">Nhập / Xuất kho</h2><div id="invFormBody">${invFormHTML()}</div></section>
-  <section class="card"><h2>Lịch sử kho</h2>
+  <section class="card"><div class="hd"><h2>Lịch sử kho</h2><button class="ibtn" data-act="invhist-open" aria-label="Xem toàn bộ lịch sử kho">${ic('menu',22)}</button></div>
     <div class="seg" role="group" aria-label="Lọc lịch sử" style="margin-top:10px">${[['all','Tất cả'],['in','Nhập'],['out','Xuất']].map(x=>`<button data-act="hist-filter" data-v="${x[0]}" aria-pressed="${f.hf===x[0]}">${x[1]}</button>`).join('')}</div>
     <div id="invHist">${invHistHTML()}</div></section>`;
 }
@@ -1049,7 +1047,12 @@ document.addEventListener('click',function(e){
       if(t.tagName==='TR')go('hive:'+t.dataset.id);else hiveSheet(+t.dataset.id);break;
     case 'chip-status':state.hq.status=v;updateHiveView();break;
     case 'view':state.hq.view=v;updateHiveView();break;
-    case 'issues-all':state.hq.allIssues=!state.hq.allIssues;$('#issues').innerHTML=issuesHTML();break;
+    case 'issues-open':{
+      const iss=issueHives(), nb=iss.filter(x=>x.status==='bad').length;
+      openSheet(`<div class="hd"><h3>Các thùng có vấn đề</h3><button class="ibtn" data-act="close-all" aria-label="Đóng">${ic('close',20)}</button></div>
+      <div class="hint">${iss.length} thùng: ${nb} có vấn đề · ${iss.length-nb} cần theo dõi</div>
+      <div style="margin-top:4px">${issuesHTML(9999)}</div>`);
+      break}
     case 'range':state.range=v;$$('[data-act="range"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));drawHiveChart(HIVES[state.route.id-1]);break;
     case 'copy-qr':{
       const txt='vietbee://hive/'+HIVES[state.route.id-1].id;
@@ -1058,14 +1061,33 @@ document.addEventListener('click',function(e){
     case 'save-rec':saveRecord();break;
     case 'fin-type':state.fin.type=v;$('#finForm').innerHTML=finFormHTML();break;
     case 'fin-save':saveTxn();break;
-    case 'fin-more':state.fin.more=!state.fin.more;$('#txns').innerHTML=txnHTML();break;
+    case 'txn-open':
+      openSheet(`<div class="hd"><h3>Lịch sử giao dịch</h3><button class="ibtn" data-act="close-all" aria-label="Đóng">${ic('close',20)}</button></div>
+      <div class="hint">${TXNS.length} giao dịch · đơn vị triệu VNĐ</div>
+      <div style="margin-top:4px">${txnHTML(9999)}</div>`);
+      break;
     case 'inv-sort':{const f=state.inv;if(f.sk===t.dataset.k)f.dir*=-1;else{f.sk=t.dataset.k;f.dir=1}$('#invList').innerHTML=invListHTML();break}
     case 'inv-more':state.inv.shown+=10;$('#invList').innerHTML=invListHTML();break;
     case 'inv-tab':state.inv.tab=v;state.inv.pre=$('#iItem')?$('#iItem').value:'';$('#invFormBody').innerHTML=invFormHTML();break;
-    case 'inv-restock':state.inv.tab='in';state.inv.pre=t.dataset.code;$('#invFormBody').innerHTML=invFormHTML();$('#invForm').scrollIntoView({behavior:'smooth',block:'start'});break;
+    case 'invalert-open':
+      openSheet(`<div class="hd"><h3>Cảnh báo tồn kho</h3><button class="ibtn" data-act="close-all" aria-label="Đóng">${ic('close',20)}</button></div>
+      <div class="hint">${ITEMS.filter(i=>stockSt(i)!=='ok').length} mặt hàng dưới ngưỡng</div>
+      <div style="margin-top:4px">${invAlertsHTML(9999)}</div>`);
+      break;
+    case 'inv-restock':closeAll();state.inv.tab='in';state.inv.pre=t.dataset.code;$('#invFormBody').innerHTML=invFormHTML();$('#invForm').scrollIntoView({behavior:'smooth',block:'start'});break;
     case 'inv-save':saveStock();break;
-    case 'hist-filter':state.inv.hf=v;state.inv.hmore=false;$$('[data-act="hist-filter"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));$('#invHist').innerHTML=invHistHTML();break;
-    case 'hist-more':state.inv.hmore=!state.inv.hmore;$('#invHist').innerHTML=invHistHTML();break;
+    case 'hist-filter':state.inv.hf=v;$$('[data-act="hist-filter"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));$('#invHist').innerHTML=invHistHTML();if($('#sheetInvHist'))$('#sheetInvHist').innerHTML=invHistHTML(9999);break;
+    case 'hist-open':{
+      const h=HIVES[state.route.id-1];if(!h)break;
+      openSheet(`<div class="hd"><h3>Lịch sử ghi nhận</h3><button class="ibtn" data-act="close-all" aria-label="Đóng">${ic('close',20)}</button></div>
+      <div class="hint">${h.id} · Khu ${h.zone} · ${h.hist.length} ghi nhận</div>
+      <div id="sheetHist">${histHTML(h,9999)}</div>`);
+      break}
+    case 'invhist-open':
+      openSheet(`<div class="hd"><h3>Lịch sử kho</h3><button class="ibtn" data-act="close-all" aria-label="Đóng">${ic('close',20)}</button></div>
+      <div class="seg" role="group" aria-label="Lọc lịch sử" style="margin-top:8px">${[['all','Tất cả'],['in','Nhập'],['out','Xuất']].map(x=>`<button data-act="hist-filter" data-v="${x[0]}" aria-pressed="${state.inv.hf===x[0]}">${x[1]}</button>`).join('')}</div>
+      <div id="sheetInvHist" style="margin-top:4px">${invHistHTML(9999)}</div>`);
+      break;
     case 'sw':{
       const path=(t.dataset.k||'').split('.'), sec=path.length>1?state.acct[path[0]]:state.acct, key=path[path.length-1];
       if(!sec||!(key in sec))break;
