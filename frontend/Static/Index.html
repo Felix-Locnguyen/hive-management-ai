@@ -73,6 +73,7 @@ h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.2
 .cats button[aria-pressed="true"]{background:#FBEFD5;border-color:#E8CF96;color:#B07A12}
 .pager{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px}
 .pager .btn:disabled{opacity:.4;cursor:default}
+.tbl .linkbtn+.linkbtn{margin-left:12px}
 .cb{position:relative;height:190px;margin-top:10px}
 .cb.sm{height:150px}
 .empty{padding:18px 0;text-align:center;color:var(--muted);font-size:13px}
@@ -428,7 +429,7 @@ const ITEM_SRC=[
  ['Tấm nền sáp','Vật tư',140,'tờ',60,6000],['Dây thép căng khung','Vật tư',15,'cuộn',5,30000],['Đinh ghim khung','Vật tư',30,'hộp',10,12000],['Lưới cách chúa','Vật tư',40,'tấm',15,28000],['Cửa thu nhỏ lối ra','Vật tư',50,'cái',20,8000],['Thùng nhân đàn 5 khung','Vật tư',10,'cái',5,280000],['Chân đỡ thùng ong','Vật tư',30,'cái',10,55000],['Khung cầu mini','Vật tư',12,'cái',20,18000],['Lồng nhốt chúa','Vật tư',25,'cái',10,9000],
  ['Bột phấn hoa bổ sung','Chăm sóc',20,'kg',8,120000],['Thuốc trị Varroa','Chăm sóc',4,'hộp',6,95000],['Men tiêu hóa cho ong','Chăm sóc',30,'gói',10,40000],['Siro kích đàn','Chăm sóc',40,'lít',20,35000],['Mùn cưa hun khói','Chăm sóc',25,'kg',10,8000],['Bẫy sâu ngài sáp','Chăm sóc',14,'hộp',10,70000],['Dung dịch sát khuẩn','Chăm sóc',12,'lít',5,45000],
  ['Lọ mật ong 1000ml','Đóng gói',22,'thùng',10,260000],['Nắp lọ nhôm','Đóng gói',15,'thùng',6,120000],['Nhãn mác lọ','Đóng gói',8,'cuộn',15,150000],['Hộp quà mật ong','Đóng gói',60,'cái',30,25000],['Túi giấy đựng','Đóng gói',61,'cái',50,3000],['Thùng carton vận chuyển','Đóng gói',80,'cái',30,12000],['Băng keo','Đóng gói',40,'cuộn',15,18000],['Phễu lọc mật inox','Đóng gói',4,'cái',2,250000],['Can đựng mật 20 lít','Đóng gói',30,'cái',10,95000],
- ['Dầu bôi trơn máy quay','Thiết bị',3,'chai',2,85000],['Sơn chống thấm','Thiết bị',12,'lít',5,120000],['Pin cảm biến AA','Thiết bị',3,'hộp',10,90000],['Dây điện nguồn','Thiết bị',60,'mét',20,12000],['Bộ dụng cụ sửa chữa','Thiết bị',4,'bộ',2,350000],['Ốc vít inox','Thiết bị',25,'hộp',10,20000],
+ ['Dầu bôi trơn máy quay','Thiết bị',3,'chai',2,85000],['Sơn chống thấm','Thiết bị',12,'lít',5,120000],['Pin cảm biến AA','Thiết bị',0,'hộp',10,90000],['Dây điện nguồn','Thiết bị',60,'mét',20,12000],['Bộ dụng cụ sửa chữa','Thiết bị',4,'bộ',2,350000],['Ốc vít inox','Thiết bị',25,'hộp',10,20000],
  ['Giấy in nhãn QR','Đóng gói',15,'cuộn',5,55000],['Áo bảo hộ','Thiết bị',14,'bộ',6,345000],['Bình chữa cháy mini','Thiết bị',6,'bình',3,280000],['Đèn pin sạc','Thiết bị',10,'cái',4,95000]
 ];
 const ITEMS=ITEM_SRC.map((a,i)=>({code:'VT'+String(i+1).padStart(3,'0'),name:a[0],cat:a[1],qty:a[2],unit:a[3],min:a[4],price:a[5]}));
@@ -438,8 +439,8 @@ const CATVIS={'Chăm sóc':{label:'Thức ăn & Dinh dưỡng'},'Vật tư':{lab
 const catVis=c=>CATVIS[c]||{label:c};
 const INV_PAGE=6;
 const byCode=c=>ITEMS.find(i=>i.code===c);
-const stockSt=i=>i.qty<=i.min*.5?'bad':i.qty<=i.min?'warn':'ok';
-const STOCK_LABEL={ok:'Đủ hàng',warn:'Sắp hết',bad:'Rất thấp'};
+const stockSt=i=>i.qty<=0?'bad':i.qty<=i.min?'warn':'ok';
+const STOCK_LABEL={ok:'Đủ hàng',warn:'Sắp hết',bad:'Hết hàng'};
 const day=s=>new Date(s+'T08:00:00').getTime();
 const INV_LOG=[
   {ts:day('2026-10-05'),t:'in', code:'VT002',qty:100},
@@ -802,13 +803,13 @@ function invListHTML(){
   const th=(k,l,cls)=>`<th class="${cls||''}" aria-sort="${f.sk===k?(f.dir===1?'ascending':'descending'):'none'}"><button data-act="inv-sort" data-k="${k}">${l}${f.sk===k?(f.dir===1?' ↑':' ↓'):''}</button></th>`;
   if(!a.length)return '<div class="empty">Không có mặt hàng nào khớp bộ lọc.</div>';
   return `<table class="tbl"><thead><tr>${th('code','Mã')}${th('name','Tên hàng')}${th('qty','SL','r')}${th('st','TT')}<th class="r" aria-hidden="true"></th></tr></thead><tbody>
-  ${shown.map(i=>`<tr><td class="code">${i.code}</td><td><span class="nm">${esc(i.name)}</span><br><span class="cat">${catVis(i.cat).label}</span></td><td class="num">${n0(i.qty)} <span class="hint">${esc(i.unit)}</span></td><td>${st(stockSt(i),STOCK_LABEL[stockSt(i)])}</td><td class="r"><button class="linkbtn" data-act="inv-del" data-code="${i.code}">Xóa</button></td></tr>`).join('')}</tbody></table>
+  ${shown.map(i=>`<tr><td class="code">${i.code}</td><td><span class="nm">${esc(i.name)}</span><br><span class="cat">${catVis(i.cat).label}</span></td><td class="num">${n0(i.qty)} <span class="hint">${esc(i.unit)}</span></td><td>${st(stockSt(i),STOCK_LABEL[stockSt(i)])}</td><td class="r"><button class="linkbtn" data-act="inv-min" data-code="${i.code}">Ngưỡng</button><button class="linkbtn" data-act="inv-del" data-code="${i.code}">Xóa</button></td></tr>`).join('')}</tbody></table>
   <div class="pager"><button class="btn sm ghost" data-act="inv-page" data-p="prev"${f.page<=1?' disabled':''}>« Trước</button><span class="hint">Trang ${f.page}/${pages} · ${a.length} mặt hàng</span><button class="btn sm ghost" data-act="inv-page" data-p="next"${f.page>=pages?' disabled':''}>Sau »</button></div>`;
 }
 function invAlertsHTML(limit){
   const o={bad:0,warn:1},a=ITEMS.filter(i=>stockSt(i)!=='ok').sort((x,y)=>o[stockSt(x)]-o[stockSt(y)]||x.qty/x.min-y.qty/y.min);
   if(!a.length)return '<div class="empty">Mọi mặt hàng đều đủ tồn kho.</div>';
-  return `<div class="rows">${a.slice(0,limit||4).map(i=>`<div class="rowb" style="cursor:default;grid-template-columns:auto 1fr auto"><span>${st(stockSt(i),'')}</span><span><b style="font-weight:600">${esc(i.name)}</b><br><span class="m">còn ${n0(i.qty)} ${esc(i.unit)}</span></span><button class="btn sm ghost" data-act="inv-restock" data-code="${i.code}">Nhập thêm</button></div>`).join('')}</div>`;
+  return `<div class="rows">${a.slice(0,limit||4).map(i=>`<div class="rowb" style="cursor:default;grid-template-columns:auto 1fr auto"><span>${st(stockSt(i),'')}</span><span><b style="font-weight:600">${esc(i.name)}</b><br><span class="m">còn ${n0(i.qty)} ${esc(i.unit)} · nhắc tại ${n0(i.min)} ${esc(i.unit)}</span></span><button class="btn sm ghost" data-act="inv-restock" data-code="${i.code}">Nhập thêm</button></div>`).join('')}</div>`;
 }
 function invFormHTML(){
   const f=state.inv, t=f.tab, items=ITEMS.slice().sort((a,b)=>a.name.localeCompare(b.name,'vi'));
@@ -840,7 +841,7 @@ function pageInventory(){
   <section class="kpis" aria-label="Tổng quan kho">
     <div class="kpi"><div class="v">${t.n}</div><div class="l">Mặt hàng</div></div>
     <div class="kpi"><div class="v">${n0(t.qty)}</div><div class="l">Số lượng</div></div>
-    <div class="kpi"><div class="v">${t.low}</div><div class="l">Sắp hết</div></div>
+    <div class="kpi"><div class="v">${t.low}</div><div class="l">Cần chú ý</div></div>
     <div class="kpi"><div class="v">${(t.val/1e6).toFixed(1)}M</div><div class="l">Giá trị kho</div></div>
   </section>
   <section class="card" aria-label="Danh sách hàng hóa">
@@ -850,7 +851,7 @@ function pageInventory(){
       <button data-act="inv-catpill" data-v="all" aria-pressed="${f.cat==='all'}">Tất cả</button>
       ${CATS.map(c=>`<button data-act="inv-catpill" data-v="${c}" aria-pressed="${f.cat===c}">${catVis(c).label}</button>`).join('')}
     </div>
-    <div class="fld" style="margin-top:10px"><label for="is">Trạng thái</label><select id="is" data-f="ist"><option value="all">Tất cả</option><option value="ok"${f.st==='ok'?' selected':''}>Đủ hàng</option><option value="warn"${f.st==='warn'?' selected':''}>Sắp hết</option><option value="bad"${f.st==='bad'?' selected':''}>Rất thấp</option></select></div>
+    <div class="fld" style="margin-top:10px"><label for="is">Trạng thái</label><select id="is" data-f="ist"><option value="all">Tất cả</option><option value="ok"${f.st==='ok'?' selected':''}>Đủ hàng</option><option value="warn"${f.st==='warn'?' selected':''}>Sắp hết</option><option value="bad"${f.st==='bad'?' selected':''}>Hết hàng</option></select></div>
     <div id="invList">${invListHTML()}</div>
   </section>
   <section class="card"><div class="hd"><h2>Cảnh báo tồn kho</h2><span class="hint">${t.low} mặt hàng</span><button class="ibtn" data-act="invalert-open" aria-label="Xem toàn bộ cảnh báo tồn kho">${ic('menu',22)}</button></div><div id="invAlerts">${invAlertsHTML()}</div></section>
@@ -1084,6 +1085,8 @@ document.addEventListener('click',function(e){
     case 'inv-catpill':state.inv.cat=v;state.inv.page=1;$$('[data-act="inv-catpill"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));$('#invList').innerHTML=invListHTML();break;
     case 'inv-del':{const it=byCode(t.dataset.code);if(!it)break;openSheet(`<h3>Xóa mặt hàng?</h3><div class="hint" style="margin-top:8px">${esc(it.name)} (${it.code}) sẽ bị xóa khỏi danh sách kho. Đây là bản demo — reload sẽ khôi phục dữ liệu.</div><button class="btn" data-act="inv-del-ok" data-code="${it.code}">Xóa</button><button class="btn ghost" data-act="close-all">Giữ lại</button>`);break}
     case 'inv-del-ok':{const ix=ITEMS.findIndex(i=>i.code===t.dataset.code);if(ix<0)break;const nm=ITEMS[ix].name;ITEMS.splice(ix,1);closeAll();toast('Đã xóa "'+nm+'" — bản demo, reload sẽ khôi phục');go('inventory');break}
+    case 'inv-min':{const it=byCode(t.dataset.code);if(!it)break;openSheet(`<h3>Đặt ngưỡng sắp hết</h3><div class="hint" style="margin-top:8px">${esc(it.name)} (${it.code}) · đang còn ${n0(it.qty)} ${esc(it.unit)}</div><div class="fld" style="margin-top:10px"><label for="minVal">Nhắc khi tồn còn ≤</label><input id="minVal" type="number" inputmode="numeric" min="0" step="1" value="${it.min}"></div><div class="err" id="minErr" role="alert"></div><button class="btn" data-act="inv-min-ok" data-code="${it.code}">Lưu</button><button class="btn ghost" data-act="close-all">Hủy</button>`);break}
+    case 'inv-min-ok':{const it=byCode(t.dataset.code);if(!it)break;const raw=String($('#minVal').value).trim(),x=Number(raw);if(raw===''||!Number.isInteger(x)||x<0||x>99999){$('#minErr').textContent='Nhập số nguyên từ 0 đến 99.999';break}it.min=x;closeAll();toast('Đã cập nhật ngưỡng của "'+it.name+'"');go('inventory');break}
     case 'inv-tab':state.inv.tab=v;state.inv.pre=$('#iItem')?$('#iItem').value:'';$('#invFormBody').innerHTML=invFormHTML();break;
     case 'invalert-open':
       openSheet(`<div class="hd"><h3>Cảnh báo tồn kho</h3><button class="ibtn" data-act="close-all" aria-label="Đóng">${ic('close',20)}</button></div>
