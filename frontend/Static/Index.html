@@ -12,7 +12,7 @@
   --bg:#EEF0EA; --bg2:#E1E5DC; --card:#FFFFFF; --soft:#F4F6F1; --ink:#1E231F; --muted:#626C64; --line:#DADFD5;
   --brand:#E58A1F; --brand-ink:#2B1A04;
   --ok:#23834F; --on-ok:#FFFFFF; --warn:#E8B900; --on-warn:#2A2000; --bad:#C93A3A; --on-bad:#FFFFFF;
-  --nav-active:#16A34A; --nav-bg:rgba(255,255,255,.88);
+  --nav-active:#16A34A; --nav-bg:rgba(255,255,255,.88);k
   --c-blue:#4F7CA3; --c-brown:#8A6A3B;
   --r1:#4A3822; --r2:#8A6A3B; --r3:#B88A3E; --r4:#E3C27E; --r5:#8C9788; --r6:#C7CEC2;
   --font:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
@@ -74,6 +74,36 @@ h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.2
 .pager{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px}
 .pager .btn:disabled{opacity:.4;cursor:default}
 .tbl .linkbtn+.linkbtn{margin-left:12px}
+/* ---- Card danh sách vật tư ---- */
+.icards{display:flex;flex-direction:column;gap:12px;background:#FAF7F2;border-radius:12px;padding:12px;margin-top:12px}
+.icard{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);line-height:1.5;transition:box-shadow .15s ease,transform .15s ease}
+.icard:active{transform:scale(.995)}
+@media (hover:hover){.icard:hover{box-shadow:0 3px 10px rgba(0,0,0,.09)}}
+.itop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.iname{font-size:16px;font-weight:600}
+.iq{display:flex;flex-direction:column;align-items:flex-end;flex:none}
+.iqty{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.iunit{font-size:13px;color:var(--muted)}
+.ibar{display:block;width:64px;height:4px;border-radius:2px;background:var(--line);margin-top:6px;overflow:hidden}
+.ibar i{display:block;height:100%;border-radius:2px}
+.ibar.s-ok i{background:#6BAA75}.ibar.s-warn i{background:#E8A93B}.ibar.s-bad i{background:#D9695F}
+.imeta{font-size:13px;color:#8A847B;margin-top:6px}
+.imeta .icode{font-weight:600;font-variant-numeric:tabular-nums}
+.ibot{display:flex;align-items:center;gap:8px;margin-top:12px}
+.spill{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.sdot{width:8px;height:8px;border-radius:50%;flex:none}
+.spill.s-ok{background:rgba(107,170,117,.15);color:#3F7A49}.spill.s-ok .sdot{background:#6BAA75}
+.spill.s-warn{background:rgba(232,169,59,.16);color:#8A6107}.spill.s-warn .sdot{background:#E8A93B}
+.spill.s-bad{background:rgba(217,105,95,.14);color:#9C3B33}.spill.s-bad .sdot{background:#D9695F}
+.ithr{margin-left:auto;min-height:44px;min-width:44px;padding:0 10px;border:0;background:none;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;border-radius:10px;transition:background .15s ease}
+.ithr:hover{background:var(--soft)}
+.imenu{width:44px;height:44px;border:0;background:none;font-size:22px;line-height:1;color:var(--ink);cursor:pointer;border-radius:10px;flex:none;transition:background .15s ease}
+.imenu:hover{background:var(--soft)}
+.mdiv{height:1px;background:var(--line);margin:6px 0}
+.mbtn-danger{color:#D9695F}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .icards{background:var(--bg2)}:root:not([data-theme="light"]) .spill.s-ok{color:#8FD19B}:root:not([data-theme="light"]) .spill.s-warn{color:#F0C469}:root:not([data-theme="light"]) .spill.s-bad{color:#F09A91}}
+:root[data-theme="dark"] .icards{background:var(--bg2)}
+:root[data-theme="dark"] .spill.s-ok{color:#8FD19B}:root[data-theme="dark"] .spill.s-warn{color:#F0C469}:root[data-theme="dark"] .spill.s-bad{color:#F09A91}
 .cb{position:relative;height:190px;margin-top:10px}
 .cb.sm{height:150px}
 .empty{padding:18px 0;text-align:center;color:var(--muted);font-size:13px}
@@ -435,10 +465,11 @@ const ITEM_SRC=[
 const ITEMS=ITEM_SRC.map((a,i)=>({code:'VT'+String(i+1).padStart(3,'0'),name:a[0],cat:a[1],qty:a[2],unit:a[3],min:a[4],price:a[5]}));
 const CATS=['Thiết bị','Vật tư','Chăm sóc','Đóng gói'];
 /* Nhãn hiển thị thống nhất (giá trị lọc vẫn là chuỗi gốc trong CATS) */
-const CATVIS={'Chăm sóc':{label:'Thức ăn & Dinh dưỡng'},'Vật tư':{label:'Vật tư'},'Đóng gói':{label:'Bao bì & Đóng gói'},'Thiết bị':{label:'Thiết bị'}};
+const CATVIS={'Chăm sóc':{label:'Thức ăn & Dinh dưỡng'},'Vật tư':{label:'Vật tư nuôi ong'},'Đóng gói':{label:'Bao bì & Đóng gói'},'Thiết bị':{label:'Thiết bị & Máy móc'}};
 const catVis=c=>CATVIS[c]||{label:c};
-const INV_PAGE=6;
+const INV_PAGE=4;
 const byCode=c=>ITEMS.find(i=>i.code===c);
+function nextCode(){let mx=0;ITEMS.forEach(i=>{const m=/^VT(\d+)$/.exec(i.code);if(m)mx=Math.max(mx,+m[1])});return 'VT'+String(mx+1).padStart(3,'0')}
 const stockSt=i=>i.qty<=0?'bad':i.qty<=i.min?'warn':'ok';
 const STOCK_LABEL={ok:'Đủ hàng',warn:'Sắp hết',bad:'Hết hàng'};
 const day=s=>new Date(s+'T08:00:00').getTime();
@@ -459,7 +490,7 @@ const state={
   hq:{q:'',status:'all',zone:'all',breed:'all',age:'all',sort:'id',view:'matrix'},
   range:'24h',
   fin:{type:'in'},
-  inv:{q:'',cat:'all',st:'all',sk:'code',dir:1,page:1,tab:'in',hf:'all',pre:''},
+  inv:{q:'',cat:'all',st:'all',sk:'code',dir:1,page:1,tab:'in',hf:'all',pre:'',fcat:'all',newItem:false},
   theme:'auto',
   acct:{name:'Nguyễn Văn An',role:'Chủ trại',phone:'0901234456',email:'an.vietbee@gmail.com',farm:'Trang trại ong Long Khánh',twofa:true,
     noti:{hive:true,stock:true,report:false,quiet:false},
@@ -800,10 +831,14 @@ function invListHTML(){
   const f=state.inv,a=invFiltered(),per=INV_PAGE,pages=Math.max(1,Math.ceil(a.length/per));
   if(f.page>pages)f.page=pages;if(f.page<1)f.page=1;
   const start=(f.page-1)*per,shown=a.slice(start,start+per);
-  const th=(k,l,cls)=>`<th class="${cls||''}" aria-sort="${f.sk===k?(f.dir===1?'ascending':'descending'):'none'}"><button data-act="inv-sort" data-k="${k}">${l}${f.sk===k?(f.dir===1?' ↑':' ↓'):''}</button></th>`;
   if(!a.length)return '<div class="empty">Không có mặt hàng nào khớp bộ lọc.</div>';
-  return `<table class="tbl"><thead><tr>${th('code','Mã')}${th('name','Tên hàng')}${th('qty','SL','r')}${th('st','TT')}<th class="r" aria-hidden="true"></th></tr></thead><tbody>
-  ${shown.map(i=>`<tr><td class="code">${i.code}</td><td><span class="nm">${esc(i.name)}</span><br><span class="cat">${catVis(i.cat).label}</span></td><td class="num">${n0(i.qty)} <span class="hint">${esc(i.unit)}</span></td><td>${st(stockSt(i),STOCK_LABEL[stockSt(i)])}</td><td class="r"><button class="linkbtn" data-act="inv-min" data-code="${i.code}">Ngưỡng</button><button class="linkbtn" data-act="inv-del" data-code="${i.code}">Xóa</button></td></tr>`).join('')}</tbody></table>
+  const cards=shown.map(i=>{const s=stockSt(i),v=catVis(i.cat),pct=i.min>0?Math.min(100,Math.round(i.qty/i.min*100)):null;
+    return `<article class="icard">
+      <div class="itop"><span class="iname">${esc(i.name)}</span><span class="iq"><span class="iqty">${n0(i.qty)}</span><span class="iunit">${esc(i.unit)}</span>${pct===null?'':`<span class="ibar s-${s}" title="${pct}% ngưỡng"><i style="width:${pct}%"></i></span>`}</span></div>
+      <div class="imeta"><b class="icode">${i.code}</b> · ${v.label}</div>
+      <div class="ibot"><span class="spill s-${s}"><i class="sdot"></i>${STOCK_LABEL[s]}</span><button class="ithr" data-act="inv-min" data-code="${i.code}">Ngưỡng · ${n0(i.min)}</button><button class="imenu" data-act="inv-menu" data-code="${i.code}" aria-label="Hành động khác cho ${esc(i.name)}">⋯</button></div>
+    </article>`}).join('');
+  return `<div class="icards">${cards}</div>
   <div class="pager"><button class="btn sm ghost" data-act="inv-page" data-p="prev"${f.page<=1?' disabled':''}>« Trước</button><span class="hint">Trang ${f.page}/${pages} · ${a.length} mặt hàng</span><button class="btn sm ghost" data-act="inv-page" data-p="next"${f.page>=pages?' disabled':''}>Sau »</button></div>`;
 }
 function invAlertsHTML(limit){
@@ -812,20 +847,32 @@ function invAlertsHTML(limit){
   return `<div class="rows">${a.slice(0,limit||4).map(i=>`<div class="rowb" style="cursor:default;grid-template-columns:auto 1fr auto"><span>${st(stockSt(i),'')}</span><span><b style="font-weight:600">${esc(i.name)}</b><br><span class="m">còn ${n0(i.qty)} ${esc(i.unit)} · nhắc tại ${n0(i.min)} ${esc(i.unit)}</span></span><button class="btn sm ghost" data-act="inv-restock" data-code="${i.code}">Nhập thêm</button></div>`).join('')}</div>`;
 }
 function invFormHTML(){
-  const f=state.inv, t=f.tab, items=ITEMS.slice().sort((a,b)=>a.name.localeCompare(b.name,'vi'));
-  if(!items.length)return '<div class="empty">Kho đã trống — không còn mặt hàng nào để nhập/xuất.</div>';
-  const sel=byCode(f.pre)?f.pre:items[0].code, cur=byCode(sel);
-  const opts=items.map(i=>`<option value="${i.code}"${i.code===sel?' selected':''}>${esc(i.name)} (tồn ${n0(i.qty)} ${esc(i.unit)})</option>`).join('');
+  const f=state.inv, t=f.tab;
+  if(!ITEMS.length)return '<div class="empty">Kho đã trống — không còn mặt hàng nào để nhập/xuất.</div>';
+  const pool=ITEMS.slice().filter(i=>f.fcat==='all'||i.cat===f.fcat).sort((a,b)=>a.name.localeCompare(b.name,'vi'));
+  if(t==='out'&&!pool.length)return '<div class="empty">Không có mặt hàng nào trong loại này để xuất.</div>';
+  const sel=(f.newItem&&t==='in')?'__new__':(byCode(f.pre)&&(f.fcat==='all'||byCode(f.pre).cat===f.fcat)?f.pre:(pool.length?pool[0].code:'__new__'));
+  const isNew=sel==='__new__', cur=byCode(sel)||{unit:'',price:0};
+  const opts=pool.map(i=>`<option value="${i.code}"${i.code===sel?' selected':''}>${esc(i.name)}</option>`).join('')
+    +(t==='in'?`<option value="__new__"${isNew?' selected':''}>＋ Tạo mặt hàng mới…</option>`:'');
+  const newBlock=isNew?`<div class="hint" style="margin-top:8px">Khởi tạo mặt hàng mới trong loại đang chọn.</div>
+  <div class="two"><div class="fld"><label for="iNewName">Tên hàng mới</label><input id="iNewName" type="text" maxlength="60" placeholder="Ví dụ: Mật hoa ong"></div>
+  <div class="fld"><label for="iNewUnit">Đơn vị</label><input id="iNewUnit" type="text" maxlength="12" placeholder="hộp / thùng / cái"></div></div>
+  ${f.fcat==='all'?`<div class="two"><div class="fld"><label for="iMin">Ngưỡng nhắc</label><input id="iMin" type="number" inputmode="numeric" min="0" step="1" value="0"></div>
+  <div class="fld"><label for="iNewCat">Loại hàng</label><select id="iNewCat">${CATS.map(c=>`<option value="${c}">${catVis(c).label}</option>`).join('')}</select></div></div>`
+  :`<div class="fld"><label for="iMin">Ngưỡng nhắc</label><input id="iMin" type="number" inputmode="numeric" min="0" step="1" value="0"></div>`}`:'';
   return `<div class="seg full" role="group" aria-label="Nhập hoặc xuất"><button data-act="inv-tab" data-v="in" aria-pressed="${t==='in'}">Nhập kho</button><button data-act="inv-tab" data-v="out" aria-pressed="${t==='out'}">Xuất kho</button></div>
+  <div class="fld"><label for="iCat">Loại</label><select id="iCat" data-f="ifcat"><option value="all"${f.fcat==='all'?' selected':''}>Tất cả</option>${CATS.map(c=>`<option value="${c}"${f.fcat===c?' selected':''}>${catVis(c).label}</option>`).join('')}</select></div>
   <div class="fld"><label for="iItem">Tên hàng</label><select id="iItem" data-f="iitem">${opts}</select></div>
+  ${newBlock}
   <div class="two"><div class="fld"><label for="iQty">Số lượng</label><input id="iQty" type="number" inputmode="numeric" min="1" step="1" placeholder="0"></div>
   <div class="fld"><label for="iDate">${t==='in'?'Ngày nhập':'Ngày xuất'}</label><input id="iDate" type="date" value="${isoDay(Date.now())}"></div></div>
   ${t==='in'?`<div class="fld"><label for="iSup">Nhà cung cấp</label><input id="iSup" type="text" maxlength="60" placeholder="Ví dụ: Cơ sở Ong Việt"></div>
-  <div class="fld"><label for="iPrice">Giá nhập (VNĐ / ${esc(cur.unit)})</label><input id="iPrice" type="number" inputmode="numeric" min="0" step="1000" value="${cur.price}"></div>`
+  <div class="fld"><label for="iPrice">Giá nhập (VNĐ${isNew?'':' / '+esc(cur.unit)})</label><input id="iPrice" type="number" inputmode="numeric" min="0" step="1000" value="${cur.price}"></div>`
   :`<div class="fld"><label for="iWhy">Mục đích</label><select id="iWhy"><option>Sử dụng tại trại</option><option>Bán hàng</option><option>Hư hỏng / thanh lý</option><option>Chuyển kho</option></select></div>
   <div class="fld"><label for="iWho">Người thực hiện</label><input id="iWho" type="text" maxlength="40" placeholder="Ví dụ: Anh Hùng"></div>`}
   <div class="err" id="iErr" role="alert"></div>
-  <button class="btn" data-act="inv-save">${t==='in'?'Lưu phiếu nhập':'Lưu phiếu xuất'}</button>`;
+  <button class="btn" data-act="inv-save">${t==='in'?(isNew?'Tạo mặt hàng + Lưu phiếu nhập':'Lưu phiếu nhập'):'Lưu phiếu xuất'}</button>`;
 }
 function invHistHTML(limit){
   const f=state.inv, all=INV_LOG.filter(e=>f.hf==='all'||e.t===f.hf).sort((a,b)=>b.ts-a.ts), shown=all.slice(0,limit||4);
@@ -1087,13 +1134,14 @@ document.addEventListener('click',function(e){
     case 'inv-del-ok':{const ix=ITEMS.findIndex(i=>i.code===t.dataset.code);if(ix<0)break;const nm=ITEMS[ix].name;ITEMS.splice(ix,1);closeAll();toast('Đã xóa "'+nm+'" — bản demo, reload sẽ khôi phục');go('inventory');break}
     case 'inv-min':{const it=byCode(t.dataset.code);if(!it)break;openSheet(`<h3>Đặt ngưỡng sắp hết</h3><div class="hint" style="margin-top:8px">${esc(it.name)} (${it.code}) · đang còn ${n0(it.qty)} ${esc(it.unit)}</div><div class="fld" style="margin-top:10px"><label for="minVal">Nhắc khi tồn còn ≤</label><input id="minVal" type="number" inputmode="numeric" min="0" step="1" value="${it.min}"></div><div class="err" id="minErr" role="alert"></div><button class="btn" data-act="inv-min-ok" data-code="${it.code}">Lưu</button><button class="btn ghost" data-act="close-all">Hủy</button>`);break}
     case 'inv-min-ok':{const it=byCode(t.dataset.code);if(!it)break;const raw=String($('#minVal').value).trim(),x=Number(raw);if(raw===''||!Number.isInteger(x)||x<0||x>99999){$('#minErr').textContent='Nhập số nguyên từ 0 đến 99.999';break}it.min=x;closeAll();toast('Đã cập nhật ngưỡng của "'+it.name+'"');go('inventory');break}
-    case 'inv-tab':state.inv.tab=v;state.inv.pre=$('#iItem')?$('#iItem').value:'';$('#invFormBody').innerHTML=invFormHTML();break;
+    case 'inv-menu':{const it=byCode(t.dataset.code);if(!it)break;openSheet(`<h3>${esc(it.name)}</h3><div class="hint" style="margin-top:6px">${it.code} · ${catVis(it.cat).label}</div><div style="margin-top:14px"><button class="btn ghost" data-act="inv-min" data-code="${it.code}">Đặt ngưỡng</button><div class="mdiv"></div><button class="btn ghost mbtn-danger" data-act="inv-del" data-code="${it.code}">Xóa</button></div>`);break}
+    case 'inv-tab':{state.inv.tab=v;state.inv.newItem=false;const iv=$('#iItem');state.inv.pre=iv&&byCode(iv.value)?iv.value:'';$('#invFormBody').innerHTML=invFormHTML();break}
     case 'invalert-open':
       openSheet(`<div class="hd"><h3>Cảnh báo tồn kho</h3><button class="ibtn" data-act="close-all" aria-label="Đóng">${ic('close',20)}</button></div>
       <div class="hint">${ITEMS.filter(i=>stockSt(i)!=='ok').length} mặt hàng dưới ngưỡng</div>
       <div style="margin-top:4px">${invAlertsHTML(9999)}</div>`);
       break;
-    case 'inv-restock':closeAll();state.inv.tab='in';state.inv.pre=t.dataset.code;$('#invFormBody').innerHTML=invFormHTML();$('#invForm').scrollIntoView({behavior:'smooth',block:'start'});break;
+    case 'inv-restock':closeAll();state.inv.tab='in';state.inv.newItem=false;state.inv.pre=t.dataset.code;$('#invFormBody').innerHTML=invFormHTML();$('#invForm').scrollIntoView({behavior:'smooth',block:'start'});break;
     case 'inv-save':saveStock();break;
     case 'hist-filter':state.inv.hf=v;$$('[data-act="hist-filter"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));$('#invHist').innerHTML=invHistHTML();if($('#sheetInvHist'))$('#sheetInvHist').innerHTML=invHistHTML(9999);break;
     case 'hist-open':{
@@ -1158,7 +1206,8 @@ document.addEventListener('change',function(e){
   if(f==='zone'||f==='breed'||f==='age'){state.hq[f]=v;updateHiveView()}
   else if(f==='sort'){state.hq.sort=v;if(v!=='id')state.hq.view='list';updateHiveView()}
   else if(f==='ist'){state.inv.st=v;state.inv.page=1;$('#invList').innerHTML=invListHTML()}
-  else if(f==='iitem'){state.inv.pre=v;const p=$('#iPrice');if(p)p.value=byCode(v).price;const l=p&&p.previousElementSibling;if(l)l.textContent='Giá nhập (VNĐ / '+byCode(v).unit+')'}
+  else if(f==='ifcat'){state.inv.fcat=v;$('#invFormBody').innerHTML=invFormHTML()}
+  else if(f==='iitem'){if(v==='__new__'){state.inv.newItem=true;$('#invFormBody').innerHTML=invFormHTML();const nw=$('#iNewName');if(nw&&nw.focus)nw.focus()}else{state.inv.newItem=false;state.inv.pre=v;const p=$('#iPrice');if(p&&byCode(v)){p.value=byCode(v).price;const l=p.previousElementSibling;if(l)l.textContent='Giá nhập (VNĐ / '+byCode(v).unit+')'}}}
   else if(f==='rtype'){const w=$('#rYieldWrap');if(w)w.hidden=v!=='Thu hoạch'}
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAll()});
@@ -1194,6 +1243,25 @@ function saveStock(){
   const f=state.inv,t=f.tab,it=byCode($('#iItem').value),qty=parseInt($('#iQty').value,10),date=$('#iDate').value,err=$('#iErr');
   if(!(qty>0)){err.textContent='Nhập số lượng lớn hơn 0.';return}
   if(!date){err.textContent='Chọn ngày.';return}
+  if(t==='in'&&!it){ // khởi tạo mặt hàng mới
+    const name=$('#iNewName').value.trim(),unit=$('#iNewUnit').value.trim(),minRaw=String($('#iMin').value).trim(),minV=minRaw===''?0:parseInt(minRaw,10);
+    const cat=$('#iNewCat')?$('#iNewCat').value:(f.fcat!=='all'?f.fcat:null);
+    if(!name){err.textContent='Nhập tên hàng mới.';return}
+    if(ITEMS.some(i=>i.name.trim().toLowerCase()===name.toLowerCase())){err.textContent='Tên hàng đã tồn tại: '+name+'. Chọn hàng có sẵn trong danh sách.';return}
+    if(!unit){err.textContent='Nhập đơn vị (hộp, thùng, cái…).';return}
+    if(!cat){err.textContent='Chọn loại hàng.';return}
+    if(!Number.isInteger(minV)||minV<0||minV>99999){err.textContent='Ngưỡng nhắc: số nguyên từ 0 đến 99.999.';return}
+    const price=parseInt($('#iPrice').value,10);
+    const nit={code:nextCode(),name:name,cat:cat,qty:qty,unit:unit,min:minV,price:price>=0?price:0};
+    ITEMS.push(nit);
+    const sup=$('#iSup').value.trim();
+    INV_LOG.push({ts:whenOf(date),t:'in',code:nit.code,qty:qty,note:sup?'NCC: '+sup:''});
+    f.newItem=false;f.pre=nit.code;
+    toast('Đã tạo mặt hàng "'+name+'" + nhập kho');
+    render();
+    return;
+  }
+  if(!it){err.textContent='Chọn mặt hàng.';return}
   let note='';
   if(t==='out'){
     if(qty>it.qty){err.textContent='Không đủ hàng: '+it.name+' chỉ còn '+n0(it.qty)+' '+it.unit+'.';return}
