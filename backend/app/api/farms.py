@@ -52,7 +52,7 @@ def update_farm(farm_id:int, data: FarmUpdate, db: Session = Depends(get_db)):
         setattr(farm, key, value)
     db.commit()
     db.refresh(farm)
-    return 
+    return farm
 
 # xoa thong tai trang trai
 @router.delete("/{farm_id}")

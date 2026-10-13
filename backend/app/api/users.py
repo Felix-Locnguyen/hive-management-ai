@@ -36,7 +36,7 @@ def create_user(data: UserCreate, db: Session= Depends(get_db)):
     exists = db.scalar(
         select(User).
         where(User.email == data.email)
-        ).first()
+        )
     if exists:
         raise HTTPException(status_code=409, detail="email da ton tai")
 
