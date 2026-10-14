@@ -13,20 +13,20 @@ router = APIRouter(prefix="/api/hives", tags=["Hives"])
 # kiem tra id thung co ton tai khong
 def _get_or_404(db: Session, hive_id:int):
     hive = db.get(Hive, hive_id)
-    if not Hive:
+    if not hive:
         raise HTTPException(status_code=404, detail=f"Khong tin thay hive id = {hive_id}")
     return hive
 
 
 # Tổng hợp các trạng thái thùng ong để hiển thị lên KPI Dashboard
-@router.get("/start")
+@router.get("/stats")
 def hive_stats(db:Session = Depends(get_db)):
     """GET /api/hives/stats — KPI khớp card '128 thùng' trên dashboard."""
     rows = db.execute(
-        select(Hive.status, func.count()).group_by(Hive.status).all()
-    )
+        select(Hive.status, func.count()).group_by(Hive.status)
+    ).all()
 
-    counts = {status: counts for status, count in rows}
+    counts = {status: count for status, count in rows}
     return {
         "total": sum(counts.values()),
         "ok": counts.get("ok", 0),
@@ -81,8 +81,8 @@ def update_hive(hive_id: int, data: HiveUpdate, db: Session = Depends(get_db)):
     fields = data.model_dump(exclude_unset=True)
     if "code" in fields:
         other = db.scalars(
-            select(Hive).where(Hive.code == fields["code"], Hive.id != hive_id).first()
-        )
+            select(Hive).where(Hive.code == fields["code"], Hive.id != hive_id)
+        ).first()
         if other:
             raise HTTPException(status_code=409, detail="Ma so hive da ton tai")
     for key, value in fields.items():
