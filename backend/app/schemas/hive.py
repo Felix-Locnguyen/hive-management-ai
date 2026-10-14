@@ -22,7 +22,7 @@ class HiveUpdate(BaseModel):
     farm_id: int | None = None
     code: str | None = Field(default=None, min_length=1, max_length=10)
     name: str | None = Field(default=None, min_length=2, max_length=80)
-    zone: str | None = Field(default=None, pattern=ZONE_PATTERN)
+    zone: str | None = Field(default=None, min_length=1, max_length=3)
     status: str | None = Field(default=None, pattern=STATUS_PATTERN)
     issue: str | None = Field(default=None, max_length=200)
     queen_year: int | None = Field(default=None, ge=2000, le=2100)

@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 
-from app.api import farms, users
+from app.api import farms, users, hives
 from app.config import settings
 from app.database import Base, engine
+
 
 # Quét tất cả các model đã kế thừa từ Base và tự động tạo bảng tương ứng trong CSDL
 # (Ở giai đoạn đầu chưa có model nào được viết, dòng này chạy qua nhưng chưa tạo bảng gì)
@@ -16,7 +17,8 @@ app = FastAPI(
 )
 
 app.include_router(users.router)
-app.include_router(farms.router)    
+app.include_router(farms.router)
+app.include_router(hives.router)  
 
 # Định nghĩa API Endpoint cho đường dẫn gốc (Root)
 @app.get("/", tags=["Health"])
