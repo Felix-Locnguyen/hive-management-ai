@@ -5,8 +5,10 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.farm import Farm
 from app.models.hive import Hive
-from app.schemas.hive import HiveCreate, HiveRead, HiveUpdate
+from app.models.hive_record import HiveRecord
 
+from app.schemas.hive import HiveCreate, HiveRead, HiveUpdate
+from app.schemas.hive_record import HiveRecordCreate, HiveRecordRead, HiveRecordUpdate
 
 router = APIRouter(prefix="/api/hives", tags=["Hives"])
 
@@ -55,6 +57,7 @@ def list_hives(
     return db.scalars(stmt.order_by(Hive.id)).all()
 
 
+
 # kiem tra id
 @router.get("/{hive_id}", response_model=HiveRead)
 def get_hive(hive_id: int, db: Session = Depends(get_db)):
@@ -99,3 +102,27 @@ def delete_hive(hive_id: int, db: Session = Depends(get_db)):
     db.delete(hive)
     db.commit()
     return {"deleted": hive_id}
+
+
+""" Lich trinh cham soc """
+# thong tin bao bao tung thung 
+@router.get("/{hive_id}/records", response_model=list[HiveRecordRead])
+def list_hive_records(hive_id:int, db: Session = Depends(get_db)):
+    """GET /api/hives/12/records — lich su cham soc, moi nhat nam truoc."""
+    _get_or_404(db, hive_id)
+    return db.scalars(
+        select(HiveRecord)
+        .where(HiveRecord.hive_id == hive_id)
+        .order_by(HiveRecord.checked_at.desc(), HiveRecord.id.desc())
+    ).all()
+
+# them ghi chu cham soc moi cho thung ong 
+@router.post("/{hive_id}/records", response_model=HiveRecordRead, status_code=201)
+def create_hive_record(hive_id: int, data: HiveRecordCreate, db: Session = Depends(get_db)):
+    """POST /api/hives/12/records — them 1 ban ghi (201)."""
+    _get_or_404(db, hive_id)
+    record = HiveRecord(**data.model_dump(), hive_id=hive_id)  # ep schema + gan FK
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
