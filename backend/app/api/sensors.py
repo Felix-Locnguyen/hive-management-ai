@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query 
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from datetime import datetime, timedelta, timezone
@@ -22,7 +22,7 @@ def _get_or_404(db: Session, hive_id: int) -> Hive:
 def latest_reading(hive_id: int, db: Session = Depends(get_db)):
     """GET /api/hives/12/readings/latest — du lieu cam bien moi nhat."""
     _get_or_404(db, hive_id)
-    reading = db.scalar(
+    reading = db.scalars(                    # scalars() tra ve collection -> dung .first()
         select(SensorReading)
         .where(SensorReading.hive_id == hive_id)
         .order_by(SensorReading.recorded_at.desc(), SensorReading.id.desc())
@@ -40,28 +40,26 @@ def list_readings(
     limit: int = Query(default=200, ge=1, le=1000), # gioi han so luong ban ghi tra ve
     db: Session = Depends(get_db),
 ):
-    """GET /api/hives/12/readings?hours=24&limit=100 — tra ve cu -> moi de ve chart."""
+    """GET /api/hives/12/readings/chart?hours=24&limit=100 — tra ve cu -> moi de ve chart."""
     # kiem tra thung ong ton tai
     _get_or_404(db, hive_id)
     # tinh thoi diem gioi han (UTC)
     since = datetime.now(timezone.utc) - timedelta(hours=hours)
-    # lay du lieu cam bien tu thoi diem gioi han den hien tai, sap
-    row = db.scalers(
+    # lay du lieu cam bien tu thoi diem gioi han den hien tai, sap xep moi nhat truoc
+    row = db.scalars(                        # chu y: KHAC db.scalar (lay 1 gia tri)
         select(SensorReading)
         .where(SensorReading.hive_id == hive_id, SensorReading.recorded_at >= since)
         .order_by(SensorReading.recorded_at.desc())
+        .limit(limit)
     ).all()
-    return list(reversed(row))  # dao nguoc de tra ve tu cu -> moi
-     # DB lay moi nhat truoc (de LIMIT chinh xac), chart can cu -> moi
-
-
+    return list(reversed(row))  # dao nguoc de tra ve tu cu -> moi, chart can cu -> moi
 
 # thiet bi gui du lieu cam bien len server
-@router.post("/", response_model=SensorReadingRead, status_code = 201)
+@router.post("", response_model=SensorReadingRead, status_code = 201)
 def create_reading(hive_id: int,  data: SensorReadingCreate,
                     db: Session = Depends(get_db)):
     """POST /api/hives/12/readings — thiet bi gui du lieu cam bien len server."""
-    hive = _get_or_404(db, hive_id)
+    _get_or_404(db, hive_id)
     payload = data.model_dump() # lay du lieu tu request body
     when = payload.get("recorded_at") # lay thoi diem do tu request body
     if when is None:
@@ -69,8 +67,6 @@ def create_reading(hive_id: int,  data: SensorReadingCreate,
     elif when.tzinfo is None: # .tzinfo la ham kiem tra xem datetime co timezone hay khong
         payload["recorded_at"] = when.replace(tzinfo=timezone.utc)   # client gui naive -> gan UTC
     reading = SensorReading(**payload, hive_id=hive_id)
-
-    reading = SensorReading(**payload, hive_id= hive_id)
     db.add(reading)
     db.commit()
     db.refresh(reading)

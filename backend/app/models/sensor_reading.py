@@ -1,11 +1,8 @@
-from datetime import datetime, date
-from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey, func
-from sqlalchemy.orm import mapped_column, Mapped
+from datetime import datetime
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, func
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
-
-class SensorReading(Base):
-    __tablename__ = "sensor_readings"
 
 
 class SensorReading(Base):

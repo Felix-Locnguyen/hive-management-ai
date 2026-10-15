@@ -1,15 +1,17 @@
-from datetime import date, datetime
+from datetime import datetime
 from pydantic import BaseModel, Field
 
-# Thiet bi gui du lieu cam bien ve server
+
 # Thiet bi gui du lieu cam bien len
 class SensorReadingCreate(BaseModel):
     recorded_at: datetime | None = None           # bo trong -> server lay hien tai (UTC)
-    temperature: float = Field(ge=-10, le=60)     # nhiet do (�C)
+    temperature: float = Field(ge=-10, le=60)     # nhiet do (°C)
     humidity: float = Field(ge=0, le=100)         # do am (%)
     sound_level: float | None = Field(default=None, ge=0, le=200)  # am thanh (dB)
     battery: int | None = Field(default=None, ge=0, le=100)        # muc pin thiet bi (%)
 
+
+# Doc du lieu cam bien
 class SensorReadingRead(BaseModel):
     id: int
     hive_id: int
