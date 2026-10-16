@@ -2,10 +2,12 @@
 Du lieu mau
 """
 from sqlalchemy import select
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 
 from app.database import SessionLocal
 from app.models.hive_record import HiveRecord
+from app.models.sensor_reading import SensorReading
+
 from app.models.farm import Farm
 from app.models.user import User
 from app.models.hive import Hive
@@ -118,6 +120,32 @@ def seed():
                 ])
                 db.commit()
                 print("Seed OK: 10 ban ghi nhan cho V12")
+
+        # 3 Du lieu cam bien (gia dinh cho thung v12)
+        if db.scalars(select(SensorReading)).first():
+            print("DB da co sensor_readings — bo qua seed sensor data.")
+        else:
+            hive = db.scalars(
+                select(Hive).where(Hive.code == "V12")
+            ).first()
+            if hive is None:
+                print("khong tim thay hive v12 - bo qua seed readings")
+            else:
+                now = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0) 
+                readings = []
+                for i in range(24):
+                    readings.append(SensorReading(
+                        hive_id = hive.id,
+                        recorded_at = now - timedelta(hours=23-i),
+                        temperature=round(33.0 + i * 0.12, 1),  # tang dan -> 35.8 (khop hive V12 status=bad)
+                        humidity=round(62 + i * 0.7, 1),        # tang dan -> 78.1
+                        sound_level=round(55 + i * 0.8, 1),     # ong dong -> am thanh to hon
+                        battery=95 - i // 3,                    # pin giam dan
+                        ))
+                    db.add_all(readings)
+                    db.commit()
+                    db.refresh(hive)
+                    print("Seed OK: 24 sensor readings cho V12")
     finally:
         db.close()
 
