@@ -46,8 +46,10 @@ def list_alerts(
         stmt = stmt.where(Alert.hive_id == hive_id)
     if severity:
         stmt = stmt.where(Alert.severity == severity)
-    if unread is not None:
-        stmt = stmt.where(Alert.is_read.is_(unread))
+    if unread is True:
+        stmt = stmt.where(Alert.is_read.is_(False))  # ?unread=true  -> canh bao CHUA doc
+    elif unread is False:
+        stmt = stmt.where(Alert.is_read.is_(True))   # ?unread=false -> canh bao DA doc
     # canh bao moi nhat len truoc
     return db.scalars(stmt.order_by(Alert.created_at.desc()).limit(limit)).all()
 

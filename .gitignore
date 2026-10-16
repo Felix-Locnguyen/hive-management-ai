@@ -1,4 +1,3 @@
-cat << 'EOF' > .gitignore
 # Python & AI
 __pycache__/
 *.py[cod]
@@ -9,6 +8,9 @@ venv/
 *.onnx
 *.engine
 
+# Database (SQLite local)
+*.db
+
 # Node / Frontend
 node_modules/
 dist/
@@ -18,5 +20,4 @@ build/
 # PlatformIO / Firmware
 .pio/
 .vscode/
-EOF
 PROJECT PLAN.md
