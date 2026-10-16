@@ -142,10 +142,9 @@ def seed():
                         sound_level=round(55 + i * 0.8, 1),     # ong dong -> am thanh to hon
                         battery=95 - i // 3,                    # pin giam dan
                         ))
-        db.add_all(readings)
-        db.commit()
-        db.refresh(hive)
-        print("Seed OK: 24 sensor readings cho V12")
+                db.add_all(readings)
+                db.commit()
+                print("Seed OK: 24 sensor readings cho V12")
     finally:
         db.close()
 
