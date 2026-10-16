@@ -11,6 +11,7 @@ from app.models.sensor_reading import SensorReading
 from app.models.farm import Farm
 from app.models.user import User
 from app.models.hive import Hive
+from app.models.alert import Alert
 
 
 # khoi tao gia tri cac thung ong co van de (status= bad)
@@ -53,7 +54,16 @@ RECORDS_V12 = [
     (date(2026, 8, 19), "Thu hoạch", "3,4 kg mật", "Anh Hùng"),
 ]
 
-
+ALERTS_SEED = [
+    (12,  "bad",   "sensor", "Mật ong chua — nhiệt độ tổ cao kéo dài", False, False),
+    (44,  "bad",   "sensor", "Nhiễm độc do thuốc — dấu hiệu ong chết ở đáy thùng", False, False),
+    (58,  "bad",   "ai",     "AI phát hiện sâu bệnh trên ảnh cửa tổ (độ tin cậy 94%)", False, False),
+    (92,  "bad",   "sensor", "Thiếu mật — tổ giảm cân nặng bất thường", False, False),
+    (103, "bad",   "manual", "Nhiễm độc do thuốc — đã phun xử lý, chờ theo dõi", True, True),
+    (123, "bad",   "ai",     "AI phát hiện ong bắp cày quanh thùng (độ tin cậy 96%)", False, False),
+    (7,   "watch", "sensor", "Cần kiểm tra mật độ ong", True, False),
+    (21,   "watch", "sensor", "Theo dõi nguy cơ đóng tổ", True, False),
+        ]
 
 
 
@@ -145,6 +155,27 @@ def seed():
                 db.add_all(readings)
                 db.commit()
                 print("Seed OK: 24 sensor readings cho V12")
+
+        # 4 canh bao mau - guard rieng
+        if db.scalars(select(Alert)).first():
+            print("DB da co alerts — bo qua seed alerts.")
+        else:
+            alerts = []
+            for hive_id, severity, source, message, is_read, done in ALERTS_SEED:
+                if db.get(Hive, hive_id) is None:
+                    continue # khong tim thay thung thi bo qua
+                alerts.append(Alert(
+                    hive_id = hive_id,
+                    severity = severity,
+                    source  = source,
+                    message = message,
+                    is_read = is_read,
+                    resolved_at=(datetime.now(timezone.utc) - timedelta(days=1)) if done else None,
+                ))
+            db.add_all(alerts)
+            db.commit()
+            print(f"Seed OK: {len(alerts)} canh bao mau")
+
     finally:
         db.close()
 

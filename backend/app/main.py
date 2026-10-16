@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import farms, sensors, users, hives
+from app.api import farms, sensors, alerts, users, hives
 from app.config import settings
 from app.database import Base, engine
 
@@ -19,7 +19,8 @@ app = FastAPI(
 app.include_router(users.router)
 app.include_router(farms.router)
 app.include_router(hives.router)
-app.include_router(sensors.router)  
+app.include_router(sensors.router)
+app.include_router(alerts.router)
 
 # Định nghĩa API Endpoint cho đường dẫn gốc (Root)
 @app.get("/", tags=["Health"])
